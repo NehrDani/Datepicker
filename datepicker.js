@@ -77,6 +77,7 @@
         col = createElement("td");
         btn = createElement("button");
         btn.classList.add("pick-btn");
+        btn.classList.add("pick-month");
         btn.innerHTML = MONTHS[count];
         btn.setAttribute("month", count);
         btn.addEventListener("click", function (e) {
@@ -97,43 +98,39 @@
   function renderTableHead () {
     var prev, change, next;
 
-    // <thead>
-    var head = createElement("thead");
-    // <tr>
-    var row = createElement("tr");
+    // <div class="pick-head">
+    var head = createElement("div");
+    head.classList.add("pick-head");
 
-    // <td>
-    row.appendChild(createElement("td"));
-    // <button type="button" class="pick-btn">&lt;</button>
+    // <button type="button" class="pick-btn pick-prev">
     prev = createElement("button");
     prev.setAttribute("type", "button");
     prev.classList.add("pick-btn");
+    prev.classList.add("pick-prev");
+    // text
     prev.innerHTML = "&lt;";
-    row.children[0].appendChild(prev);
-    // </td>
+    head.appendChild(prev);
+    // </button>
 
-    // <td colspan="5">
-    row.appendChild(createElement("td"));
-    row.children[1].setAttribute("colspan", 5);
-    // <button type="button" class="pick-btn">{month year}</button>
+    // <button type="button" class="pick-btn pick-change">
     change = createElement("button");
     change.classList.add("pick-btn");
+    change.classList.add("pick-change");
+    // text
     change.innerHTML = MONTHS[state.month] + " " + state.year;
-    row.children[1].appendChild(change);
-    // </td>
+    head.appendChild(change);
+    // </button>
 
-    // <td>
-    row.appendChild(createElement("td"));
-    // <button type="button" class="pick-btn">&gt;</button>
+    // <button type="button" class="pick-btn pick-next">
     next = createElement("button");
     next.classList.add("pick-btn");
+    next.classList.add("pick-next");
+    // text
     next.innerHTML = "&gt;";
-    row.children[2].appendChild(next);
-    // </td>
+    head.appendChild(next);
+    // </button>
 
-    head.appendChild(row);
-    // </tr>
-    // </thead>
+    // </div>
 
     prev.addEventListener("click", function (e) {
       e.preventDefault();
@@ -163,7 +160,7 @@
     }
 
     var table = createElement("table");
-    table.appendChild(renderTableHead());
+    // table.appendChild(renderTableHead());
     table.appendChild(createElement("tbody"));
     var head = createElement("tr");
     var weekday;
@@ -172,7 +169,7 @@
       weekday.innerHTML = getWeekday(w);
       head.appendChild(weekday);
     }
-    table.children[1].appendChild(head);
+    table.firstChild.appendChild(head);
 
     var row, col, btn;
     var day = 0;
@@ -218,13 +215,14 @@
       col.appendChild(btn);
       row.appendChild(col);
       if (++r === 7) {
-        table.children[1].appendChild(row);
+        table.firstChild.appendChild(row);
         row = createElement("tr");
         r = 0;
       }
     }
 
     datepick.innerHTML = "";
+    datepick.appendChild(renderTableHead());
     datepick.appendChild(table);
   }
 

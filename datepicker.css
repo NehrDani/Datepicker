@@ -3,8 +3,15 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+.datepicker {
+  width: 290px;
+  background-color: #fcfcfc;
+  padding: 4px;
+  border: 1px solid #ccc;
+}
 
 .datepicker table {
+  width: 100%;
   border-collapse: collapse;
 }
 
@@ -12,9 +19,20 @@
   padding: 0;
 }
 
+.datepicker .pick-head {
+  width: 100%;
+  margin: 4px 0;
+}
+.datepicker .pick-head .pick-prev, .datepicker .pick-head .pick-next {
+  width: 20%;
+}
+.datepicker .pick-head .pick-change {
+  width: 60%;
+}
+
 .pick-btn {
   display: inline-block;
-  background: #fff;
+  background: transparent;
   border: 1px solid transparent;
   box-shadow: inset 0 0 1px 1px transparent;
   padding: 5px 10px;
@@ -22,16 +40,22 @@
   cursor: pointer;
   width: 100%;
   outline: none;
+  text-align: center;
+}
+.pick-btn:hover {
+  background-color: #eee;
 }
 
 .pick-day {}
-.pick-day:hover {
-  background-color: #eee;
-}
 .pick-day.active {
   color: rgb(0, 100, 200);
   font-weight: bold;
 }
 .pick-day.out {
-  opacity: 0.3;
+  color: #ccc;
+}
+
+.pick-month {}
+.pick-month.active {
+  color: rgb(0, 100, 200);
 }
