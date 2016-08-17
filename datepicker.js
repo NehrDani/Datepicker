@@ -59,6 +59,7 @@
     state.year = state.date.getFullYear();
 
     renderDatePicker();
+    renderMonthPicker();
     return;
   }
 
@@ -66,10 +67,10 @@
     month = parseInt(month);
     if (month < 0)  {
       state.month = 11;
-      setYear(state.year - 1);
+      return setYear(state.year - 1);
     } else if (month > 11) {
       state.month = 0;
-      setYear(state.year + 1);
+      return setYear(state.year + 1);
     } else {
       state.month = month;
     }
@@ -100,12 +101,15 @@
         btn = createElement("button");
         btn.classList.add("pick-btn");
         btn.classList.add("pick-month");
+        if (state.date.getMonth() === count &&
+        state.date.getFullYear() === state.year) {
+          btn.classList.add("active");
+        }
         btn.innerHTML = MONTHS[count];
-        btn.setAttribute("month", count);
+        btn.value = count;
         btn.addEventListener("click", function (e) {
           e.preventDefault();
-          setMonth(this.getAttribute("month"));
-          renderDatePicker();
+          setMonth(this.value);
         });
         col.appendChild(btn);
         row.appendChild(col);
@@ -131,7 +135,7 @@
     prev.classList.add("pick-btn");
     prev.classList.add("pick-prev");
     // text
-    prev.innerHTML = "&lt;";
+    prev.innerHTML = "&#9666";
     head.appendChild(prev);
     // </button>
 
@@ -159,7 +163,7 @@
     next.classList.add("pick-btn");
     next.classList.add("pick-next");
     // text
-    next.innerHTML = "&gt;";
+    next.innerHTML = "&#9656";
     head.appendChild(next);
     // </button>
 
@@ -256,9 +260,9 @@
         y = state.year;
       }
 
-      if (state.day === day &&
-      state.year === y &&
-      state.month === m) {
+      if (state.date.getDate() === day &&
+      state.date.getFullYear() === y &&
+      state.date.getMonth() === m) {
         btn.classList.add("active");
       }
 

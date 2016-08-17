@@ -12,6 +12,7 @@
 .datepicker table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .datepicker table td, .datepicker table th {
@@ -60,4 +61,5 @@
 .pick-month {}
 .pick-month.active {
   color: rgb(0, 100, 200);
+  font-weight: bold;
 }
