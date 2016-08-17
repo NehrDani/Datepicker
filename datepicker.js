@@ -24,6 +24,7 @@
 
   var state = {
     today: new Date(),
+    date: new Date(),
     year: 0,
     month: 0,
     day: 0
@@ -50,17 +51,38 @@
     return WEEKDAYS[i];
   }
 
+  function setDate (date) {
+    date = date.split("-");
+    state.date = new Date(date[0], date[1], date[2]);
+    state.day = state.date.getDate();
+    state.month = state.date.getMonth();
+    state.year = state.date.getFullYear();
+
+    renderDatePicker();
+    return;
+  }
+
   function setMonth (month) {
     month = parseInt(month);
     if (month < 0)  {
       state.month = 11;
-      state.year--;
+      setYear(state.year - 1);
     } else if (month > 11) {
       state.month = 0;
-      state.year++;
+      setYear(state.year + 1);
     } else {
       state.month = month;
     }
+    renderDatePicker();
+    renderMonthPicker();
+    return;
+  }
+
+  function setYear (year) {
+    state.year = parseInt(year);
+    renderDatePicker();
+    renderMonthPicker();
+    return;
   }
 
   function renderMonthPicker () {
@@ -92,10 +114,11 @@
       table.children[1].appendChild(row);
     }
     monthpick.innerHTML = "";
+    monthpick.appendChild(renderHead("month"));
     monthpick.appendChild(table);
   }
 
-  function renderTableHead () {
+  function renderHead (view) {
     var prev, change, next;
 
     // <div class="pick-head">
@@ -117,7 +140,17 @@
     change.classList.add("pick-btn");
     change.classList.add("pick-change");
     // text
-    change.innerHTML = MONTHS[state.month] + " " + state.year;
+    switch (view) {
+    case "day":
+      change.innerHTML = MONTHS[state.month] + " " + state.year;
+      break;
+    case "month":
+      change.innerHTML = state.year;
+      break;
+    case "year":
+      break;
+    }
+
     head.appendChild(change);
     // </button>
 
@@ -132,16 +165,33 @@
 
     // </div>
 
+    // bind events
     prev.addEventListener("click", function (e) {
       e.preventDefault();
-      setMonth(state.month - 1);
-      renderDatePicker();
+      switch (view) {
+      case "day":
+        setMonth(state.month - 1);
+        break;
+      case "month":
+        setYear(state.year - 1);
+        break;
+      case "year":
+        break;
+      }
     });
 
     next.addEventListener("click", function (e) {
       e.preventDefault();
-      setMonth(state.month + 1);
-      renderDatePicker();
+      switch (view) {
+      case "day":
+        setMonth(state.month + 1);
+        break;
+      case "month":
+        setYear(state.year + 1);
+        break;
+      case "year":
+        break;
+      }
     });
 
     return head;
@@ -160,7 +210,6 @@
     }
 
     var table = createElement("table");
-    // table.appendChild(renderTableHead());
     table.appendChild(createElement("tbody"));
     var head = createElement("tr");
     var weekday;
@@ -202,15 +251,24 @@
         }
         day = day - days;
         btn.classList.add("out");
+      } else {
+        m = state.month;
+        y = state.year;
       }
 
-      if (state.today.getDate() === day &&
-      state.today.getFullYear() === state.year &&
-      state.today.getMonth() === state.month) {
+      if (state.day === day &&
+      state.year === y &&
+      state.month === m) {
         btn.classList.add("active");
       }
 
       btn.innerHTML = day;
+      btn.value = y+"-"+m+"-"+day;
+
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        setDate(this.value);
+      });
 
       col.appendChild(btn);
       row.appendChild(col);
@@ -222,7 +280,7 @@
     }
 
     datepick.innerHTML = "";
-    datepick.appendChild(renderTableHead());
+    datepick.appendChild(renderHead("day"));
     datepick.appendChild(table);
   }
 
