@@ -37,6 +37,8 @@
   datepick.classList.add("datepicker");
   var monthpick = createElement("div");
   monthpick.classList.add("datepicker");
+  var yearpick = createElement("div");
+  yearpick.classList.add("datepicker");
 
   function getDaysInMonth (year, month) {
     return month === 1 && year % 4 === 0 &&
@@ -60,6 +62,7 @@
 
     renderDatePicker();
     renderMonthPicker();
+    renderYearPicker();
     return;
   }
 
@@ -76,23 +79,75 @@
     }
     renderDatePicker();
     renderMonthPicker();
+    renderYearPicker();
     return;
   }
 
   function setYear (year) {
-    state.year = parseInt(year);
+    state.year = parseInt(year) > 0 ? parseInt(year) : 0;
     renderDatePicker();
     renderMonthPicker();
+    renderYearPicker();
     return;
   }
 
-  function renderMonthPicker () {
+  function getStartYear (year, range) {
+    return parseInt((state.year - 1) / range) * range + 1;
+  }
+
+  function renderYearPicker () {
+    var row, col, btn;
+    var year = getStartYear(state.year, 25);
+
+    // <table>
     var table = createElement("table");
-    table.appendChild(createElement("thead"));
+    // <tbody>
     table.appendChild(createElement("tbody"));
 
+    for (var r = 0; r < 5; r++) {
+      // <tr>
+      row = createElement("tr");
+      for (var c = 0; c < 5; c++) {
+        // </td>
+        col = createElement("td");
+        // <button class="pick-btn pick-year">
+        btn = createElement("button");
+        btn.classList.add("pick-btn");
+        btn.classList.add("pick-year");
+        if (state.date.getFullYear() === year) {
+          btn.classList.add("active");
+        }
+        btn.innerHTML = year;
+        btn.value = year;
+
+        // add event
+        btn.addEventListener("click", function (e) {
+          e.preventDefault();
+          setYear(this.value);
+        });
+        // </button>
+        col.appendChild(btn);
+        row.appendChild(col);
+        // </td>
+        year++;
+      }
+      table.firstChild.appendChild(row);
+      // </tr>
+    }
+
+    yearpick.innerHTML = "";
+    yearpick.appendChild(renderHead("year"));
+    yearpick.appendChild(table);
+  }
+
+  function renderMonthPicker () {
     var row, col, btn;
     var count = 0;
+
+    // <table>
+    var table = createElement("table");
+    // <tbody>
+    table.appendChild(createElement("tbody"));
 
     for (var r = 0; r < 4; r++) {
       row = createElement("tr");
@@ -115,7 +170,7 @@
         row.appendChild(col);
         count++;
       }
-      table.children[1].appendChild(row);
+      table.firstChild.appendChild(row);
     }
     monthpick.innerHTML = "";
     monthpick.appendChild(renderHead("month"));
@@ -136,6 +191,22 @@
     prev.classList.add("pick-prev");
     // text
     prev.innerHTML = "&#9666";
+
+    // bind event
+    prev.addEventListener("click", function (e) {
+      e.preventDefault();
+      switch (view) {
+      case "day":
+        setMonth(state.month - 1);
+        break;
+      case "month":
+        setYear(state.year - 1);
+        break;
+      case "year":
+        setYear(state.year - 25);
+        break;
+      }
+    });
     head.appendChild(prev);
     // </button>
 
@@ -152,6 +223,10 @@
       change.innerHTML = state.year;
       break;
     case "year":
+      var start = getStartYear(state.year, 25);
+      var end = start + 24;
+      change.innerHTML = start + " - " + end;
+      change.classList.add("disabled");
       break;
     }
 
@@ -164,26 +239,8 @@
     next.classList.add("pick-next");
     // text
     next.innerHTML = "&#9656";
-    head.appendChild(next);
-    // </button>
 
-    // </div>
-
-    // bind events
-    prev.addEventListener("click", function (e) {
-      e.preventDefault();
-      switch (view) {
-      case "day":
-        setMonth(state.month - 1);
-        break;
-      case "month":
-        setYear(state.year - 1);
-        break;
-      case "year":
-        break;
-      }
-    });
-
+    // bind event
     next.addEventListener("click", function (e) {
       e.preventDefault();
       switch (view) {
@@ -194,15 +251,19 @@
         setYear(state.year + 1);
         break;
       case "year":
+        setYear(state.year + 25);
         break;
       }
     });
+    head.appendChild(next);
+    // </button>
+
+    // </div>
 
     return head;
   }
 
   function renderDatePicker () {
-    // var date = new Date();
     var start = 0;
     var days = getDaysInMonth(state.year, state.month);
     var before = new Date(state.year, state.month, 1).getDay();
@@ -290,7 +351,9 @@
 
   renderDatePicker();
   renderMonthPicker();
+  renderYearPicker();
 
   document.querySelector("main").appendChild(datepick);
   document.querySelector("main").appendChild(monthpick);
+  document.querySelector("main").appendChild(yearpick);
 })(window, document);

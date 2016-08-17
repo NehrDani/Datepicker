@@ -23,11 +23,17 @@
   width: 100%;
   margin: 4px 0;
 }
-.datepicker .pick-head .pick-prev, .datepicker .pick-head .pick-next {
+.datepicker .pick-head .pick-prev,
+.datepicker .pick-head .pick-next {
   width: 20%;
 }
 .datepicker .pick-head .pick-change {
   width: 60%;
+}
+.datepicker .pick-head .pick-change.disabled {
+  box-shadow: none;
+  background-color: transparent;
+  cursor: default;
 }
 
 .pick-btn {
@@ -60,6 +66,12 @@
 
 .pick-month {}
 .pick-month.active {
+  color: rgb(0, 100, 200);
+  font-weight: bold;
+}
+
+.pick-year {}
+.pick-year.active {
   color: rgb(0, 100, 200);
   font-weight: bold;
 }
