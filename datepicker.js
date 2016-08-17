@@ -50,6 +50,19 @@
     return WEEKDAYS[i];
   }
 
+  function setMonth (month) {
+    month = parseInt(month);
+    if (month < 0)  {
+      state.month = 11;
+      state.year--;
+    } else if (month > 11) {
+      state.month = 0;
+      state.year++;
+    } else {
+      state.month = month;
+    }
+  }
+
   function renderMonthPicker () {
     var table = createElement("table");
     table.appendChild(createElement("thead"));
@@ -68,7 +81,7 @@
         btn.setAttribute("month", count);
         btn.addEventListener("click", function (e) {
           e.preventDefault();
-          state.month = this.getAttribute("month");
+          setMonth(this.getAttribute("month"));
           renderDatePicker();
         });
         col.appendChild(btn);
@@ -77,6 +90,7 @@
       }
       table.children[1].appendChild(row);
     }
+    monthpick.innerHTML = "";
     monthpick.appendChild(table);
   }
 
@@ -123,13 +137,13 @@
 
     prev.addEventListener("click", function (e) {
       e.preventDefault();
-      state.month--;
+      setMonth(state.month - 1);
       renderDatePicker();
     });
 
     next.addEventListener("click", function (e) {
       e.preventDefault();
-      state.month++;
+      setMonth(state.month + 1);
       renderDatePicker();
     });
 
@@ -162,7 +176,7 @@
 
     var row, col, btn;
     var day = 0;
-    var m = 0, y = 0;
+    var m = state.month, y = state.year;
 
     row = createElement("tr");
     for (var i = start, r = 0; i < (42 + start); i++) {
