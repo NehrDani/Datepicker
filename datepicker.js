@@ -1,7 +1,28 @@
-(function() {
-  function createElement (element) {
-    return document.createElement(element);
+(function () {
+  /* helper functions */
+  function createElement (element, options) {
+    var node = document.createElement(element);
+
+    if (options !== undefined) {
+      for (var option in options) {
+        switch (option) {
+        case "class":
+          node.className = options[option];
+          break;
+        case "value":
+          if (node.value !== undefined) node.value = options[option];
+          break;
+        default:
+          node.setAttribute(option, options[option]);
+          break;
+        }
+      }
+    }
+
+    return node;
   }
+
+  /* constants */
 
   var MONTHS = [
     "January",
@@ -33,12 +54,9 @@
   state.month = state.today.getMonth();
   state.day = state.today.getDate();
 
-  var datepick = createElement("div");
-  datepick.classList.add("datepicker");
-  var monthpick = createElement("div");
-  monthpick.classList.add("datepicker");
-  var yearpick = createElement("div");
-  yearpick.classList.add("datepicker");
+  var datepick = createElement("div", {class: "datepicker"});
+  var monthpick = createElement("div", {class: "datepicker"});
+  var yearpick = createElement("div", {class: "datepicker"});
 
   function getDaysInMonth (year, month) {
     return month === 1 && year % 4 === 0 &&
@@ -95,100 +113,17 @@
     return parseInt((state.year - 1) / range) * range + 1;
   }
 
-  function renderYearPicker () {
-    var row, col, btn;
-    var year = getStartYear(state.year, 25);
-
-    // <table>
-    var table = createElement("table");
-    // <tbody>
-    table.appendChild(createElement("tbody"));
-
-    for (var r = 0; r < 5; r++) {
-      // <tr>
-      row = createElement("tr");
-      for (var c = 0; c < 5; c++) {
-        // </td>
-        col = createElement("td");
-        // <button class="pick-btn pick-year">
-        btn = createElement("button");
-        btn.classList.add("pick-btn");
-        btn.classList.add("pick-year");
-        if (state.date.getFullYear() === year) {
-          btn.classList.add("active");
-        }
-        btn.innerHTML = year;
-        btn.value = year;
-
-        // add event
-        btn.addEventListener("click", function (e) {
-          e.preventDefault();
-          setYear(this.value);
-        });
-        // </button>
-        col.appendChild(btn);
-        row.appendChild(col);
-        // </td>
-        year++;
-      }
-      table.firstChild.appendChild(row);
-      // </tr>
-    }
-
-    yearpick.innerHTML = "";
-    yearpick.appendChild(renderHead("year"));
-    yearpick.appendChild(table);
-  }
-
-  function renderMonthPicker () {
-    var row, col, btn;
-    var count = 0;
-
-    // <table>
-    var table = createElement("table");
-    // <tbody>
-    table.appendChild(createElement("tbody"));
-
-    for (var r = 0; r < 4; r++) {
-      row = createElement("tr");
-      for (var c = 0; c < 3; c++) {
-        col = createElement("td");
-        btn = createElement("button");
-        btn.classList.add("pick-btn");
-        btn.classList.add("pick-month");
-        if (state.date.getMonth() === count &&
-        state.date.getFullYear() === state.year) {
-          btn.classList.add("active");
-        }
-        btn.innerHTML = MONTHS[count];
-        btn.value = count;
-        btn.addEventListener("click", function (e) {
-          e.preventDefault();
-          setMonth(this.value);
-        });
-        col.appendChild(btn);
-        row.appendChild(col);
-        count++;
-      }
-      table.firstChild.appendChild(row);
-    }
-    monthpick.innerHTML = "";
-    monthpick.appendChild(renderHead("month"));
-    monthpick.appendChild(table);
-  }
-
   function renderHead (view) {
     var prev, change, next;
 
     // <div class="pick-head">
-    var head = createElement("div");
-    head.classList.add("pick-head");
+    var head = createElement("div", {class: "pick-head"});
 
     // <button type="button" class="pick-btn pick-prev">
-    prev = createElement("button");
-    prev.setAttribute("type", "button");
-    prev.classList.add("pick-btn");
-    prev.classList.add("pick-prev");
+    prev = createElement("button", {
+      type: "button",
+      class: "pick-btn pick-prev"
+    });
     // text
     prev.innerHTML = "&#9666";
 
@@ -211,9 +146,10 @@
     // </button>
 
     // <button type="button" class="pick-btn pick-change">
-    change = createElement("button");
-    change.classList.add("pick-btn");
-    change.classList.add("pick-change");
+    change = createElement("button", {
+      type: "button",
+      class: "pick-btn pick-change"
+    });
     // text
     switch (view) {
     case "day":
@@ -226,17 +162,17 @@
       var start = getStartYear(state.year, 25);
       var end = start + 24;
       change.innerHTML = start + " - " + end;
-      change.classList.add("disabled");
+      change.className += " disabled";
       break;
     }
-
     head.appendChild(change);
     // </button>
 
     // <button type="button" class="pick-btn pick-next">
-    next = createElement("button");
-    next.classList.add("pick-btn");
-    next.classList.add("pick-next");
+    next = createElement("button", {
+      type: "button",
+      class: "pick-btn pick-next"
+    });
     // text
     next.innerHTML = "&#9656";
 
@@ -257,96 +193,249 @@
     });
     head.appendChild(next);
     // </button>
-
     // </div>
 
     return head;
   }
 
+  function renderYearPicker () {
+    var row, col, btn;
+    var year = getStartYear(state.year, 25);
+
+    // <table>
+    var table = createElement("table");
+    // <tbody>
+    table.appendChild(createElement("tbody"));
+
+    // <tr>
+    row = createElement("tr");
+
+    for (var r = 0, c = 0; r < 25; r++) {
+      // </td>
+      col = createElement("td");
+      // <button type="button" class="pick-btn pick-year" value={year}>
+      btn = createElement("button", {
+        type: "button",
+        class: "pick-btn pick-year",
+        value: year
+      });
+      // text
+      btn.innerHTML = year;
+
+      // active if selected year
+      if (state.date.getFullYear() === year) {
+        btn.className += " active";
+      }
+
+      // add event
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        setYear(this.value);
+      });
+
+      col.appendChild(btn);
+      // </button>
+      row.appendChild(col);
+      // </td>
+
+      year++;
+      // </tr>
+
+      if (++c === 5) {
+        table.firstChild.appendChild(row);
+        row = createElement("tr");
+        c = 0;
+      }
+    }
+    // </tbody>
+
+    yearpick.innerHTML = "";
+    yearpick.appendChild(renderHead("year"));
+    yearpick.appendChild(table);
+    // </table>
+  }
+
+  function renderMonthPicker () {
+    var row, col, btn;
+    var month = 0;
+
+    // <table>
+    var table = createElement("table");
+    // <tbody>
+    table.appendChild(createElement("tbody"));
+
+    // <tr>
+    row = createElement("tr");
+
+    for (var r = 0, c = 0; r < 12; r++) {
+      // <td>
+      col = createElement("td");
+      // <button type="button" class="pick-btn pick-month" value={month}>
+      btn = createElement("button", {
+        type: "button",
+        class: "pick-btn pick-month",
+        value: month
+      });
+      // text
+      btn.innerHTML = MONTHS[month];
+
+      // set active if selected month
+      if (state.date.getMonth() === month &&
+      state.date.getFullYear() === state.year) {
+        btn.classList.add("active");
+      }
+
+      // bind event
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        setMonth(this.value);
+      });
+
+      col.appendChild(btn);
+      // </button>
+
+      row.appendChild(col);
+      // </td>
+
+      month++;
+
+      if (++c === 3) {
+        table.firstChild.appendChild(row);
+        row = createElement("tr");
+        c = 0;
+      }
+      // </tr>
+    }
+    // <tbody>
+
+    monthpick.innerHTML = "";
+    monthpick.appendChild(renderHead("month"));
+    monthpick.appendChild(table);
+    // </table>
+  }
+
   function renderDatePicker () {
+    var row, col, btn;
+    var day = 0, month = 0, year = 0;
     var start = 0;
-    var days = getDaysInMonth(state.year, state.month);
-    var before = new Date(state.year, state.month, 1).getDay();
-    before -= firstDay;
+    var weekday;
+    var daysInMonth = getDaysInMonth(state.year, state.month);
+    var before = new Date(state.year, state.month, 1).getDay() - firstDay;
+
+    /*
+    If week doesnt start on day 0
+    check for starting weekday of selected month
+    and push all days to fit the selected start day
+
+    If month starts on start day add a additional week
+    to preserve the 6 weeks calendar
+    */
     if (before < 0) {
       before += 7;
     } else if (before === 0) {
       start -= 7;
     }
 
+    // <table>
     var table = createElement("table");
-    table.appendChild(createElement("tbody"));
+    // <thead>
+    table.appendChild(createElement("thead"));
+    // <tr>
     var head = createElement("tr");
-    var weekday;
+
+    // <th>
     for (var w = 0; w < 7; w++) {
       weekday = createElement("th");
       weekday.innerHTML = getWeekday(w);
       head.appendChild(weekday);
     }
+    // </th>
     table.firstChild.appendChild(head);
+    // </tr>
 
-    var row, col, btn;
-    var day = 0;
-    var m = state.month, y = state.year;
-
+    // <tr>
     row = createElement("tr");
-    for (var i = start, r = 0; i < (42 + start); i++) {
 
-      day = 1 + (i - before);
+    // <td>
+    for (var i = start, c = 0; i < (42 + start); i++) {
       col = createElement("td");
 
-      btn = createElement("button");
-      btn.classList.add("pick-btn");
-      btn.classList.add("pick-day");
+      day = 1 + (i - before);
+      month = state.month;
+      year = state.year;
+
+      // <button class="pick-btn pick-day">
+      btn = createElement("button", {
+        type: "button",
+        class: "pick-btn pick-day"
+      });
+
+      /*
+      if day is is before selected month
+      set button to out
+      */
       if (i < before) {
         if (state.month === 0) {
-          m = 11;
-          y = state.year - 1;
+          month = 11;
+          year = state.year - 1;
         } else {
-          m = state.month - 1;
+          month = state.month - 1;
         }
-        day = getDaysInMonth(y, m) + day;
+        day = getDaysInMonth(year, month) + day;
         btn.classList.add("out");
-      } else if (i >= (days + before)) {
+
+      /*
+      if day is after selected month
+      set button to out
+      */
+      } else if (i >= (daysInMonth + before)) {
         if (state.month === 11) {
-          m = 0;
-          y = state.year + 1;
+          month = 0;
+          year = state.year + 1;
         } else {
-          m = state.month + 1;
+          month = state.month + 1;
         }
-        day = day - days;
+        day = day - daysInMonth;
         btn.classList.add("out");
-      } else {
-        m = state.month;
-        y = state.year;
       }
 
+      // set active if selected day
       if (state.date.getDate() === day &&
-      state.date.getFullYear() === y &&
-      state.date.getMonth() === m) {
+      state.date.getMonth() === month &&
+      state.date.getFullYear() === year) {
         btn.classList.add("active");
       }
 
+      // text
       btn.innerHTML = day;
-      btn.value = y+"-"+m+"-"+day;
+      // value
+      btn.value = year + "-" + month + "-" + day;
 
+      // add event
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setDate(this.value);
       });
 
       col.appendChild(btn);
+      // </button>
+
       row.appendChild(col);
-      if (++r === 7) {
+      // </td>
+
+      if (++c === 7) {
         table.firstChild.appendChild(row);
         row = createElement("tr");
-        r = 0;
+        c = 0;
       }
+      // </tr>
     }
+    // <thead>
 
     datepick.innerHTML = "";
     datepick.appendChild(renderHead("day"));
     datepick.appendChild(table);
+    // </table>
   }
 
   renderDatePicker();
