@@ -1,4 +1,8 @@
 (function() {
+  function createElement (element) {
+    return document.createElement(element);
+  }
+
   var MONTHS = [
     "january",
     "february",
@@ -17,18 +21,34 @@
   var WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 
   var firstDay = 1;
-  var month = 7;
-  var year = 2016;
-  var today = new Date();
 
-  function setMonth (id) {
-    month = parseInt(id);
-    return month;
-  }
+  var state = {
+    today: new Date(),
+    year: 0,
+    month: 0,
+    day: 0
+  };
+  state.year = state.today.getFullYear();
+  state.month = state.today.getMonth();
+  state.day = state.today.getDate();
+
   var datepick = createElement("div");
   datepick.classList.add("datepicker");
   var monthpick = createElement("div");
   monthpick.classList.add("datepicker");
+
+  function getDaysInMonth (year, month) {
+    return month === 1 && year % 4 === 0 &&
+      (year % 100 !== 0 || year % 400 === 0) ? 29 : DAYS_IN_MONTH[month];
+  }
+
+  function getWeekday (i) {
+    i += firstDay;
+    while (i >= 7) {
+      i -= 7;
+    }
+    return WEEKDAYS[i];
+  }
 
   function renderMonthPicker () {
     var table = createElement("table");
@@ -48,7 +68,7 @@
         btn.setAttribute("month", count);
         btn.addEventListener("click", function (e) {
           e.preventDefault();
-          setMonth(this.getAttribute("month"));
+          state.month = this.getAttribute("month");
           renderDatePicker();
         });
         col.appendChild(btn);
@@ -84,7 +104,7 @@
     // <button type="button" class="pick-btn">{month}</button>
     change = createElement("button");
     change.classList.add("pick-btn");
-    change.innerHTML = MONTHS[month];
+    change.innerHTML = MONTHS[state.month];
     row.children[1].appendChild(change);
     // </td>
 
@@ -101,14 +121,19 @@
     // </tr>
     // </thead>
 
+    prev.addEventListener("click", function (e) {
+      e.preventDefault();
+
+    });
+
     return head;
   }
 
   function renderDatePicker () {
     // var date = new Date();
     var start = 0;
-    var days = getDaysInMonth(year, month);
-    var before = new Date(year, month, 1).getDay();
+    var days = getDaysInMonth(state.year, state.month);
+    var before = new Date(state.year, state.month, 1).getDay();
     before -= firstDay;
     if (before < 0) {
       before += 7;
@@ -142,26 +167,28 @@
       btn.classList.add("pick-btn");
       btn.classList.add("pick-day");
       if (i < before) {
-        if (month === 0) {
+        if (state.month === 0) {
           m = 11;
-          y = year - 1;
+          y = state.year - 1;
         } else {
-          m = month - 1;
+          m = state.month - 1;
         }
         day = getDaysInMonth(y, m) + day;
         btn.classList.add("out");
       } else if (i >= (days + before)) {
-        if (month === 11) {
+        if (state.month === 11) {
           m = 0;
-          y = year + 1;
+          y = state.year + 1;
         } else {
-          m = month + 1;
+          m = state.month + 1;
         }
         day = day - days;
         btn.classList.add("out");
       }
 
-      if (today.getDate() === day && today.getFullYear() === year && today.getMonth() === month) {
+      if (state.today.getDate() === day &&
+      state.today.getFullYear() === state.year &&
+      state.today.getMonth() === state.month) {
         btn.classList.add("active");
       }
 
@@ -185,21 +212,4 @@
 
   document.querySelector("main").appendChild(datepick);
   document.querySelector("main").appendChild(monthpick);
-
-  function getDaysInMonth (year, month) {
-    return month === 1 && year % 4 === 0 &&
-      (year % 100 !== 0 || year % 400 === 0) ? 29 : DAYS_IN_MONTH[month];
-  }
-
-  function getWeekday (i) {
-    i += firstDay;
-    while (i >= 7) {
-      i -= 7;
-    }
-    return WEEKDAYS[i];
-  }
-
-  function createElement (element) {
-    return document.createElement(element);
-  }
 })(window, document);
