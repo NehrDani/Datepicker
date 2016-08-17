@@ -4,21 +4,21 @@
   }
 
   var MONTHS = [
-    "january",
-    "february",
-    "march",
-    "april",
-    "may",
-    "june",
-    "july",
-    "august",
-    "september",
-    "october",
-    "november",
-    "december"
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December"
   ];
   var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-  var WEEKDAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+  var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   var firstDay = 1;
 
@@ -101,10 +101,10 @@
     // <td colspan="5">
     row.appendChild(createElement("td"));
     row.children[1].setAttribute("colspan", 5);
-    // <button type="button" class="pick-btn">{month}</button>
+    // <button type="button" class="pick-btn">{month year}</button>
     change = createElement("button");
     change.classList.add("pick-btn");
-    change.innerHTML = MONTHS[state.month];
+    change.innerHTML = MONTHS[state.month] + " " + state.year;
     row.children[1].appendChild(change);
     // </td>
 
@@ -123,7 +123,14 @@
 
     prev.addEventListener("click", function (e) {
       e.preventDefault();
+      state.month--;
+      renderDatePicker();
+    });
 
+    next.addEventListener("click", function (e) {
+      e.preventDefault();
+      state.month++;
+      renderDatePicker();
     });
 
     return head;
