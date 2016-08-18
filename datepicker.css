@@ -47,6 +47,12 @@
   color: #666;
 }
 
+.datepicker table tbody th {
+  font-weight: normal;
+  font-style: italic;
+  color: #666;
+}
+
 .pick-btn {
   display: inline-block;
   background: transparent;

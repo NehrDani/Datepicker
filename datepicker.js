@@ -1,5 +1,4 @@
 (function (window, document, undefined) {
-  var _lang = window.lang;
 
   /* constants */
   var YEARS_RANGE = 25;
@@ -21,6 +20,8 @@
   ];
   var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // i18n
+  var _lang = window.lang;
   if (_lang !== undefined) {
     MONTHS = _lang.months || MONTHS;
     WEEKDAYS = _lang.weekdays || WEEKDAYS;
@@ -76,10 +77,10 @@
     month = parseInt(month);
     if (month < 0)  {
       this._state.month = 11;
-      return this._setYear(this.state.year - 1);
+      return this._setYear(this._state.year - 1);
     } else if (month > 11) {
-      this.state.month = 0;
-      return this._setYear(this.state.year + 1);
+      this._state.month = 0;
+      return this._setYear(this._state.year + 1);
     } else {
       this._state.month = month;
     }
@@ -352,7 +353,7 @@
     var row, col, btn;
     var day = 0, month = 0, year = 0;
     var start = 0;
-    var weekday;
+    var weekday, week;
     var daysInMonth = getDaysInMonth(state.year, state.month);
     var before = new Date(state.year, state.month, 1).getDay();
     before -= firstDay;
@@ -376,30 +377,46 @@
     // <table>
     var datepicker = createElement("table");
     // <thead>
-    datepicker.appendChild(createElement("thead"));
+    var head = createElement("thead");
     // <tr>
-    var head = createElement("tr");
+    head.appendChild(createElement("tr"));
 
     // <th>
+    head.firstChild.appendChild(createElement("th"));
     for (var w = 0; w < 7; w++) {
       weekday = createElement("th");
       weekday.innerHTML = getWeekday(w, firstDay);
-      head.appendChild(weekday);
+      head.firstChild.appendChild(weekday);
     }
     // </th>
-    datepicker.firstChild.appendChild(head);
+    datepicker.appendChild(head);
     // </tr>
+    // </thead>
+
+    // <tbody>
+    var body = createElement("tbody");
 
     // <tr>
     row = createElement("tr");
 
-    // <td>
+    // <td> / <th>
     for (var i = start, c = 0; i < (42 + start); i++) {
-      col = createElement("td");
-
       day = 1 + (i - before);
       month = state.month;
       year = state.year;
+
+      // show week number
+      if (c === 0) {
+        //<th>
+        col = createElement("th");
+        week = getWeekNumber(new Date(year, month, day));
+        col.innerHTML = week;
+        row.appendChild(col);
+        // </th>
+      }
+
+      // <td>
+      col = createElement("td");
 
       // <button class="pick-btn pick-day">
       btn = createElement("button", {
@@ -462,13 +479,14 @@
       // </td>
 
       if (++c === 7) {
-        datepicker.firstChild.appendChild(row);
+        body.appendChild(row);
         row = createElement("tr");
         c = 0;
       }
       // </tr>
     }
-    // <thead>
+    datepicker.appendChild(body);
+    // </tbody>
     // </table>
 
     return datepicker;
@@ -527,6 +545,15 @@
 
   function getStartYear (year, range) {
     return parseInt((year - 1) / range) * range + 1;
+  }
+
+  function getWeekNumber(date) {
+    var checkDate = new Date(date);
+    checkDate.setDate(checkDate.getDate() + 4 - (checkDate.getDay() || 7)); // Thursday
+    var time = checkDate.getTime();
+    checkDate.setMonth(0); // Compare with Jan 1
+    checkDate.setDate(1);
+    return Math.floor(Math.round((time - checkDate) / 86400000) / 7) + 1;
   }
 
   function destroy () {
