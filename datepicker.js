@@ -69,28 +69,27 @@
   render("date");
 
   function render (state) {
-    var head = renderHead(state);
-    var picker;
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(renderHead(state));
 
     switch (state) {
     case "date":
-      picker = renderDatePicker();
+      fragment.appendChild(renderDatePicker());
       break;
     case "month":
-      picker = renderMonthPicker();
+      fragment.appendChild(renderMonthPicker());
       break;
     case "year":
-      picker = renderYearPicker();
+      fragment.appendChild(renderYearPicker());
       break;
     }
 
     container.innerHTML = "";
-    container.appendChild(head);
-    container.appendChild(picker);
+    container.appendChild(fragment);
   }
 
   function setState (state) {
-    render(state);
+    if (state) render(state);
   }
 
   function getDaysInMonth (year, month) {
