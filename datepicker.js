@@ -1,43 +1,7 @@
 (function (window, document, undefined) {
-  /* helper functions */
-  function createElement (element, options) {
-    var node = document.createElement(element);
-
-    if (options !== undefined) {
-      for (var option in options) {
-        switch (option) {
-        case "class":
-          node.className = options[option];
-          break;
-        case "value":
-          if (node.value !== undefined) node.value = options[option];
-          break;
-        default:
-          node.setAttribute(option, options[option]);
-          break;
-        }
-      }
-    }
-
-    return node;
-  }
-
-  function extend (out) {
-    out = out || {};
-
-    for (var i = 1; i < arguments.length; i++) {
-      if (!arguments[i]) continue;
-
-      for (var key in arguments[i]) {
-        if (arguments[i].hasOwnProperty(key))
-          out[key] = arguments[i][key];
-      }
-    }
-
-    return out;
-  }
-
   /* constants */
+
+  var YEAR_RANGE = 25;
 
   var MONTHS = [
     "January",
@@ -60,6 +24,7 @@
 
   function Datepicker (element, config) {
     this.date = new Date();
+
     this.state = {
       picker: "date",
       year: this.date.getFullYear(),
@@ -67,131 +32,86 @@
       day: this.date.getDate()
     };
 
-    this.config = {
+    this.config = extend({
       firstDay: 0
-    };
+    }, config);
 
-    this.config = extend(this.config, config);
 
-    var container = createElement("div", {class: "datepicker"});
-    element.appendChild(container);
+    this.container = createElement("div", {class: "datepicker"});
+    element.appendChild(this.container);
+    this.render("date");
   }
 
   Datepicker.prototype = {
-    _render: render,
-    setDate: setDate
+    render: render,
+    setDate: setDate,
+    setMonth: setMonth,
+    setYear: setYear,
+    renderHead: renderHead,
+    renderDatePicker: renderDatePicker,
+    renderMonthPicker: renderMonthPicker,
+    renderYearPicker: renderYearPicker
   };
 
-  // var datepicker = new Datepicker(document.querySelector("main"));
-
-  var firstDay = 1;
-  var date = new Date();
-
-  var state = {
-    picker: "date",
-    year: 0,
-    month: 0,
-    day: 0
-  };
-  state.year = date.getFullYear();
-  state.month = date.getMonth();
-  state.day = date.getDate();
-
-  var container = createElement("div", {class: "datepicker"});
-  document.querySelector("main").appendChild(container);
-  render("date");
-
-  function render (picker) {
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(renderHead(picker));
-
-    switch (picker) {
-    case "date":
-      fragment.appendChild(renderDatePicker());
-      break;
-    case "month":
-      fragment.appendChild(renderMonthPicker());
-      break;
-    case "year":
-      fragment.appendChild(renderYearPicker());
-      break;
-    }
-
-    container.innerHTML = "";
-    container.appendChild(fragment);
-  }
-
-  function getDaysInMonth (year, month) {
-    return month === 1 && year % 4 === 0 &&
-      (year % 100 !== 0 || year % 400 === 0) ? 29 : DAYS_IN_MONTH[month];
-  }
-
-  function getWeekday (i) {
-    i += firstDay;
-    while (i >= 7) {
-      i -= 7;
-    }
-    return WEEKDAYS[i];
-  }
-
-  function callback () {}
-
-  // function setState (type, value) {
-  //   switch (type) {
-  //   case "date":
-  //     setDate(value);
-  //     break;
-  //   case "month":
-  //     break;
-  //   case "year":
-  //     break;
-  //   }
-  // }
+  var datepicker = new Datepicker(document.querySelector("main"));
 
   function setDate (d) {
     d = d.split("-");
-    date = new Date(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]));
-    state.day = date.getDate();
-    state.month = date.getMonth();
-    state.year = date.getFullYear();
-    // state.picker = "date";
+    this.date = new Date(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]));
+    this.state.day = this.date.getDate();
+    this.state.month = this.date.getMonth();
+    this.state.year = this.date.getFullYear();
 
-    // render(state.picker);
-
-    callback();
+    this.callback();
     return;
   }
 
   function setMonth (month) {
     month = parseInt(month);
     if (month < 0)  {
-      state.month = 11;
-      return setYear(state.year - 1);
+      this.state.month = 11;
+      return this.setYear(this.state.year - 1);
     } else if (month > 11) {
-      state.month = 0;
-      return setYear(state.year + 1);
+      this.state.month = 0;
+      return this.setYear(this.state.year + 1);
     } else {
-      state.month = month;
+      this.state.month = month;
     }
-    // state.picker = "date";
-
-    // render(state.picker);
     return;
   }
 
   function setYear (year) {
-    state.year = parseInt(year) > 0 ? parseInt(year) : 0;
-
-    // state.picker = "month";
-    // render(state.picker);
+    this.state.year = parseInt(year) > 0 ? parseInt(year) : 0;
     return;
   }
 
-  function getStartYear (year, range) {
-    return parseInt((year - 1) / range) * range + 1;
+  function render (view) {
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(this.renderHead(view));
+
+    switch (view) {
+    case "date":
+      fragment.appendChild(this.renderDatePicker());
+      break;
+    case "month":
+      fragment.appendChild(this.renderMonthPicker());
+      break;
+    case "year":
+      fragment.appendChild(this.renderYearPicker());
+      break;
+    }
+
+    this.container.innerHTML = "";
+    this.container.appendChild(fragment);
   }
 
   function renderHead (view) {
+    // bindings
+    var state = this.state;
+    var render = this.render.bind(this);
+    var setMonth = this.setMonth.bind(this);
+    var setYear = this.setYear.bind(this);
+
     var prev, change, next;
 
     // <div class="pick-head">
@@ -218,7 +138,7 @@
         render("month");
         break;
       case "year":
-        setYear(state.year - 25);
+        setYear(state.year - YEAR_RANGE);
         render("year");
         break;
       }
@@ -242,7 +162,7 @@
       change.value = "year";
       break;
     case "year":
-      var start = getStartYear(state.year, 25);
+      var start = getStartYear(state.year, YEAR_RANGE);
       var end = start + 24;
       change.innerHTML = start + " - " + end;
       change.className += " disabled";
@@ -277,7 +197,7 @@
         render("month");
         break;
       case "year":
-        setYear(state.year + 25);
+        setYear(state.year + YEAR_RANGE);
         render("year");
         break;
       }
@@ -290,8 +210,14 @@
   }
 
   function renderYearPicker () {
+    // bindings
+    var state = this.state;
+    var date = this.date;
+    var setYear = this.setYear.bind(this);
+    var render = this.render.bind(this);
+
     var row, col, btn;
-    var year = getStartYear(state.year, 25);
+    var year = getStartYear(state.year, YEAR_RANGE);
 
     // <table>
     var yearpicker = createElement("table");
@@ -301,7 +227,7 @@
     // <tr>
     row = createElement("tr");
 
-    for (var r = 0, c = 0; r < 25; r++) {
+    for (var r = 0, c = 0; r < YEAR_RANGE; r++) {
       // </td>
       col = createElement("td");
       // <button type="button" class="pick-btn pick-year" value={year}>
@@ -322,7 +248,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setYear(this.value);
-        render("date");
+        render("month");
       });
 
       col.appendChild(btn);
@@ -340,16 +266,18 @@
       }
     }
     // </tbody>
-
-    // yearpick.innerHTML = "";
-    // yearpick.appendChild(renderHead("year"));
-    // yearpick.appendChild(table);
     // </table>
 
     return yearpicker;
   }
 
   function renderMonthPicker () {
+    // bindings
+    var state = this.state;
+    var date = this.date;
+    var setMonth = this.setMonth.bind(this);
+    var render = this.render.bind(this);
+
     var row, col, btn;
     var month = 0;
 
@@ -402,22 +330,26 @@
       // </tr>
     }
     // <tbody>
-
-    // monthpick.innerHTML = "";
-    // monthpick.appendChild(renderHead("month"));
-    // monthpick.appendChild(table);
     // </table>
 
     return monthpicker;
   }
 
   function renderDatePicker () {
+    // bindings
+    var state = this.state;
+    var firstDay = this.config.firstDay;
+    var date = this.date;
+    var setDate = this.setDate.bind(this);
+    var render = this.render.bind(this);
+
     var row, col, btn;
     var day = 0, month = 0, year = 0;
     var start = 0;
     var weekday;
     var daysInMonth = getDaysInMonth(state.year, state.month);
-    var before = new Date(state.year, state.month, 1).getDay() - firstDay;
+    var before = new Date(state.year, state.month, 1).getDay();
+    before -= firstDay;
 
     /*
     If week doesnt start on day 0
@@ -445,7 +377,7 @@
     // <th>
     for (var w = 0; w < 7; w++) {
       weekday = createElement("th");
-      weekday.innerHTML = getWeekday(w);
+      weekday.innerHTML = getWeekday(w, this.config.firstDay);
       head.appendChild(weekday);
     }
     // </th>
@@ -531,12 +463,63 @@
       // </tr>
     }
     // <thead>
-
-    // datepick.innerHTML = "";
-    // datepick.appendChild(renderHead("day"));
-    // datepick.appendChild(table);
     // </table>
 
     return datepicker;
+  }
+
+  /* helper functions */
+  function createElement (element, options) {
+    var node = document.createElement(element);
+
+    if (options !== undefined) {
+      for (var option in options) {
+        switch (option) {
+        case "class":
+          node.className = options[option];
+          break;
+        case "value":
+          if (node.value !== undefined) node.value = options[option];
+          break;
+        default:
+          node.setAttribute(option, options[option]);
+          break;
+        }
+      }
+    }
+
+    return node;
+  }
+
+  function extend (out) {
+    out = out || {};
+
+    for (var i = 1; i < arguments.length; i++) {
+      if (!arguments[i]) continue;
+
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key))
+          out[key] = arguments[i][key];
+      }
+    }
+
+    return out;
+  }
+
+  function getDaysInMonth (year, month) {
+    return month === 1 && year % 4 === 0 &&
+      (year % 100 !== 0 || year % 400 === 0) ? 29 : DAYS_IN_MONTH[month];
+  }
+
+  function getWeekday (i, first) {
+    i += first;
+    while (i >= 7) {
+      i -= 7;
+    }
+    return WEEKDAYS[i];
+  }
+
+  function getStartYear (year, range) {
+    return parseInt((year - 1) / range) * range + 1;
   }
 })(window, document);
