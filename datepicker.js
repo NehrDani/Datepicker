@@ -22,6 +22,21 @@
     return node;
   }
 
+  function extend (out) {
+    out = out || {};
+
+    for (var i = 1; i < arguments.length; i++) {
+      if (!arguments[i]) continue;
+
+      for (var key in arguments[i]) {
+        if (arguments[i].hasOwnProperty(key))
+          out[key] = arguments[i][key];
+      }
+    }
+
+    return out;
+  }
+
   /* constants */
 
   var MONTHS = [
@@ -38,41 +53,58 @@
     "November",
     "December"
   ];
-  var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
   window.Datepicker = Datepicker;
 
-  function Datepicker () {
+  function Datepicker (element, config) {
     this.date = new Date();
     this.state = {
-      year: 0,
-      month: 0,
-      day: 0
+      picker: "date",
+      year: this.date.getFullYear(),
+      month: this.date.getMonth(),
+      day: this.date.getDate()
     };
+
+    this.config = {
+      firstDay: 0
+    };
+
+    this.config = extend(this.config, config);
+
+    var container = createElement("div", {class: "datepicker"});
+    element.appendChild(container);
   }
 
+  Datepicker.prototype = {
+    _render: render
+  };
+
+  // var datepicker = new Datepicker(document.querySelector("main"));
+
   var firstDay = 1;
+  var date = new Date();
 
   var state = {
-    date: new Date(),
+    picker: "date",
     year: 0,
     month: 0,
     day: 0
   };
-  state.year = state.date.getFullYear();
-  state.month = state.date.getMonth();
-  state.day = state.date.getDate();
+  state.year = date.getFullYear();
+  state.month = date.getMonth();
+  state.day = date.getDate();
 
   var container = createElement("div", {class: "datepicker"});
   document.querySelector("main").appendChild(container);
   render("date");
 
-  function render (state) {
+  function render (picker) {
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(renderHead(state));
+    fragment.appendChild(renderHead(picker));
 
-    switch (state) {
+    switch (picker) {
     case "date":
       fragment.appendChild(renderDatePicker());
       break;
@@ -88,10 +120,6 @@
     container.appendChild(fragment);
   }
 
-  function setState (state) {
-    if (state) render(state);
-  }
-
   function getDaysInMonth (year, month) {
     return month === 1 && year % 4 === 0 &&
       (year % 100 !== 0 || year % 400 === 0) ? 29 : DAYS_IN_MONTH[month];
@@ -105,14 +133,21 @@
     return WEEKDAYS[i];
   }
 
-  function setDate (date) {
-    date = date.split("-");
-    state.date = new Date(date[0], date[1], date[2]);
-    state.day = state.date.getDate();
-    state.month = state.date.getMonth();
-    state.year = state.date.getFullYear();
+  function callback () {
+    alert(date);
+  }
 
-    setState("date");
+  function setDate (d) {
+    d = d.split("-");
+    date = new Date(d[0], d[1], d[2]);
+    state.day = date.getDate();
+    state.month = date.getMonth();
+    state.year = date.getFullYear();
+    state.picker = "date";
+
+    render(state.picker);
+
+    callback();
     return;
   }
 
@@ -127,15 +162,17 @@
     } else {
       state.month = month;
     }
+    state.picker = "date";
 
-    setState("date");
+    render(state.picker);
     return;
   }
 
   function setYear (year) {
     state.year = parseInt(year) > 0 ? parseInt(year) : 0;
 
-    setState("month");
+    state.picker = "month";
+    render(state.picker);
     return;
   }
 
@@ -200,7 +237,7 @@
     // add event
     change.addEventListener("click", function (e) {
       e.preventDefault();
-      setState(this.value);
+      render(this.value);
     });
     head.appendChild(change);
     // </button>
@@ -260,7 +297,7 @@
       btn.innerHTML = year;
 
       // active if selected year
-      if (state.date.getFullYear() === year) {
+      if (date.getFullYear() === year) {
         btn.className += " active";
       }
 
@@ -319,8 +356,8 @@
       btn.innerHTML = MONTHS[month];
 
       // set active if selected month
-      if (state.date.getMonth() === month &&
-      state.date.getFullYear() === state.year) {
+      if (date.getMonth() === month &&
+      date.getFullYear() === state.year) {
         btn.classList.add("active");
       }
 
@@ -443,9 +480,9 @@
       }
 
       // set active if selected day
-      if (state.date.getDate() === day &&
-      state.date.getMonth() === month &&
-      state.date.getFullYear() === year) {
+      if (date.getDate() === day &&
+      date.getMonth() === month &&
+      date.getFullYear() === year) {
         btn.classList.add("active");
       }
 
