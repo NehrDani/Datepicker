@@ -1,8 +1,6 @@
 (function (window, document, undefined) {
   /* constants */
-
-  var YEAR_RANGE = 25;
-
+  var YEARS_RANGE = 25;
   var MONTHS = [
     "January",
     "February",
@@ -23,94 +21,99 @@
   window.Datepicker = Datepicker;
 
   function Datepicker (element, config) {
-    this.date = new Date();
+    this._date = new Date();
 
-    this.state = {
-      picker: "date",
-      year: this.date.getFullYear(),
-      month: this.date.getMonth(),
-      day: this.date.getDate()
+    this._state = {
+      year: this._date.getFullYear(),
+      month: this._date.getMonth(),
+      day: this._date.getDate()
     };
 
-    this.config = extend({
+    this._config = extend({
       firstDay: 0
     }, config);
 
 
-    this.container = createElement("div", {class: "datepicker"});
-    element.appendChild(this.container);
-    this.render("date");
+    this._container = createElement("div", {class: "datepicker"});
+    element.appendChild(this._container);
+    this._render("date");
+
+    // this.callback = function () {
+    //
+    // };
   }
 
   Datepicker.prototype = {
-    render: render,
-    setDate: setDate,
-    setMonth: setMonth,
-    setYear: setYear,
-    renderHead: renderHead,
-    renderDatePicker: renderDatePicker,
-    renderMonthPicker: renderMonthPicker,
-    renderYearPicker: renderYearPicker
+    _render: render,
+    _setMonth: setMonth,
+    _setYear: setYear,
+    _renderHead: renderHead,
+    _renderDatePicker: renderDatePicker,
+    _renderMonthPicker: renderMonthPicker,
+    _renderYearPicker: renderYearPicker,
+    setDate: setDate
   };
 
-  var datepicker = new Datepicker(document.querySelector("main"));
+  var datepicker = new Datepicker(document.querySelector("main"), {
+    firstDay: 1
+  });
 
   function setDate (d) {
     d = d.split("-");
-    this.date = new Date(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]));
-    this.state.day = this.date.getDate();
-    this.state.month = this.date.getMonth();
-    this.state.year = this.date.getFullYear();
+    this._date = new Date(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]));
+    this._state.day = this._date.getDate();
+    this._state.month = this._date.getMonth();
+    this._state.year = this._date.getFullYear();
 
-    this.callback();
+    // this.callback();
     return;
   }
 
   function setMonth (month) {
     month = parseInt(month);
     if (month < 0)  {
-      this.state.month = 11;
-      return this.setYear(this.state.year - 1);
+      this._state.month = 11;
+      return this._setYear(this.state.year - 1);
     } else if (month > 11) {
       this.state.month = 0;
-      return this.setYear(this.state.year + 1);
+      return this._setYear(this.state.year + 1);
     } else {
-      this.state.month = month;
+      this._state.month = month;
     }
     return;
   }
 
   function setYear (year) {
-    this.state.year = parseInt(year) > 0 ? parseInt(year) : 0;
+    this._state.year = parseInt(year) > 0 ? parseInt(year) : 0;
     return;
   }
 
   function render (view) {
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(this.renderHead(view));
+    fragment.appendChild(this._renderHead(view));
 
     switch (view) {
     case "date":
-      fragment.appendChild(this.renderDatePicker());
+      fragment.appendChild(this._renderDatePicker());
       break;
     case "month":
-      fragment.appendChild(this.renderMonthPicker());
+      fragment.appendChild(this._renderMonthPicker());
       break;
     case "year":
-      fragment.appendChild(this.renderYearPicker());
+      fragment.appendChild(this._renderYearPicker());
       break;
     }
 
-    this.container.innerHTML = "";
-    this.container.appendChild(fragment);
+    this._container.innerHTML = "";
+    this._container.appendChild(fragment);
   }
 
   function renderHead (view) {
     // bindings
-    var state = this.state;
-    var render = this.render.bind(this);
-    var setMonth = this.setMonth.bind(this);
-    var setYear = this.setYear.bind(this);
+    var state = this._state;
+    var render = this._render.bind(this);
+    var setMonth = this._setMonth.bind(this);
+    var setYear = this._setYear.bind(this);
 
     var prev, change, next;
 
@@ -138,7 +141,7 @@
         render("month");
         break;
       case "year":
-        setYear(state.year - YEAR_RANGE);
+        setYear(state.year - YEARS_RANGE);
         render("year");
         break;
       }
@@ -162,7 +165,7 @@
       change.value = "year";
       break;
     case "year":
-      var start = getStartYear(state.year, YEAR_RANGE);
+      var start = getStartYear(state.year, YEARS_RANGE);
       var end = start + 24;
       change.innerHTML = start + " - " + end;
       change.className += " disabled";
@@ -197,7 +200,7 @@
         render("month");
         break;
       case "year":
-        setYear(state.year + YEAR_RANGE);
+        setYear(state.year + YEARS_RANGE);
         render("year");
         break;
       }
@@ -211,13 +214,13 @@
 
   function renderYearPicker () {
     // bindings
-    var state = this.state;
-    var date = this.date;
-    var setYear = this.setYear.bind(this);
-    var render = this.render.bind(this);
+    var state = this._state;
+    var date = this._date;
+    var setYear = this._setYear.bind(this);
+    var render = this._render.bind(this);
 
     var row, col, btn;
-    var year = getStartYear(state.year, YEAR_RANGE);
+    var year = getStartYear(state.year, YEARS_RANGE);
 
     // <table>
     var yearpicker = createElement("table");
@@ -227,7 +230,7 @@
     // <tr>
     row = createElement("tr");
 
-    for (var r = 0, c = 0; r < YEAR_RANGE; r++) {
+    for (var r = 0, c = 0; r < YEARS_RANGE; r++) {
       // </td>
       col = createElement("td");
       // <button type="button" class="pick-btn pick-year" value={year}>
@@ -273,10 +276,10 @@
 
   function renderMonthPicker () {
     // bindings
-    var state = this.state;
-    var date = this.date;
-    var setMonth = this.setMonth.bind(this);
-    var render = this.render.bind(this);
+    var state = this._state;
+    var date = this._date;
+    var setMonth = this._setMonth.bind(this);
+    var render = this._render.bind(this);
 
     var row, col, btn;
     var month = 0;
@@ -337,11 +340,11 @@
 
   function renderDatePicker () {
     // bindings
-    var state = this.state;
-    var firstDay = this.config.firstDay;
-    var date = this.date;
+    var state = this._state;
+    var firstDay = this._config.firstDay;
+    var date = this._date;
     var setDate = this.setDate.bind(this);
-    var render = this.render.bind(this);
+    var render = this._render.bind(this);
 
     var row, col, btn;
     var day = 0, month = 0, year = 0;
@@ -377,7 +380,7 @@
     // <th>
     for (var w = 0; w < 7; w++) {
       weekday = createElement("th");
-      weekday.innerHTML = getWeekday(w, this.config.firstDay);
+      weekday.innerHTML = getWeekday(w, firstDay);
       head.appendChild(weekday);
     }
     // </th>
