@@ -1,4 +1,4 @@
-(function () {
+(function (window, document, undefined) {
   /* helper functions */
   function createElement (element, options) {
     var node = document.createElement(element);
@@ -41,22 +41,57 @@
   var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  window.Datepicker = Datepicker;
+
+  function Datepicker () {
+    this.date = new Date();
+    this.state = {
+      year: 0,
+      month: 0,
+      day: 0
+    };
+  }
+
   var firstDay = 1;
 
   var state = {
-    today: new Date(),
     date: new Date(),
     year: 0,
     month: 0,
     day: 0
   };
-  state.year = state.today.getFullYear();
-  state.month = state.today.getMonth();
-  state.day = state.today.getDate();
+  state.year = state.date.getFullYear();
+  state.month = state.date.getMonth();
+  state.day = state.date.getDate();
 
-  var datepick = createElement("div", {class: "datepicker"});
-  var monthpick = createElement("div", {class: "datepicker"});
-  var yearpick = createElement("div", {class: "datepicker"});
+  var container = createElement("div", {class: "datepicker"});
+  document.querySelector("main").appendChild(container);
+  render("date");
+
+  function render (state) {
+    var head = renderHead(state);
+    var picker;
+
+    switch (state) {
+    case "date":
+      picker = renderDatePicker();
+      break;
+    case "month":
+      picker = renderMonthPicker();
+      break;
+    case "year":
+      picker = renderYearPicker();
+      break;
+    }
+
+    container.innerHTML = "";
+    container.appendChild(head);
+    container.appendChild(picker);
+  }
+
+  function setState (state) {
+    render(state);
+  }
 
   function getDaysInMonth (year, month) {
     return month === 1 && year % 4 === 0 &&
@@ -78,9 +113,7 @@
     state.month = state.date.getMonth();
     state.year = state.date.getFullYear();
 
-    renderDatePicker();
-    renderMonthPicker();
-    renderYearPicker();
+    setState("date");
     return;
   }
 
@@ -95,22 +128,20 @@
     } else {
       state.month = month;
     }
-    renderDatePicker();
-    renderMonthPicker();
-    renderYearPicker();
+
+    setState("date");
     return;
   }
 
   function setYear (year) {
     state.year = parseInt(year) > 0 ? parseInt(year) : 0;
-    renderDatePicker();
-    renderMonthPicker();
-    renderYearPicker();
+
+    setState("month");
     return;
   }
 
   function getStartYear (year, range) {
-    return parseInt((state.year - 1) / range) * range + 1;
+    return parseInt((year - 1) / range) * range + 1;
   }
 
   function renderHead (view) {
@@ -131,7 +162,7 @@
     prev.addEventListener("click", function (e) {
       e.preventDefault();
       switch (view) {
-      case "day":
+      case "date":
         setMonth(state.month - 1);
         break;
       case "month":
@@ -152,11 +183,13 @@
     });
     // text
     switch (view) {
-    case "day":
+    case "date":
       change.innerHTML = MONTHS[state.month] + " " + state.year;
+      change.value = "month";
       break;
     case "month":
       change.innerHTML = state.year;
+      change.value = "year";
       break;
     case "year":
       var start = getStartYear(state.year, 25);
@@ -165,6 +198,11 @@
       change.className += " disabled";
       break;
     }
+    // add event
+    change.addEventListener("click", function (e) {
+      e.preventDefault();
+      setState(this.value);
+    });
     head.appendChild(change);
     // </button>
 
@@ -180,7 +218,7 @@
     next.addEventListener("click", function (e) {
       e.preventDefault();
       switch (view) {
-      case "day":
+      case "date":
         setMonth(state.month + 1);
         break;
       case "month":
@@ -203,9 +241,9 @@
     var year = getStartYear(state.year, 25);
 
     // <table>
-    var table = createElement("table");
+    var yearpicker = createElement("table");
     // <tbody>
-    table.appendChild(createElement("tbody"));
+    yearpicker.appendChild(createElement("tbody"));
 
     // <tr>
     row = createElement("tr");
@@ -242,17 +280,19 @@
       // </tr>
 
       if (++c === 5) {
-        table.firstChild.appendChild(row);
+        yearpicker.firstChild.appendChild(row);
         row = createElement("tr");
         c = 0;
       }
     }
     // </tbody>
 
-    yearpick.innerHTML = "";
-    yearpick.appendChild(renderHead("year"));
-    yearpick.appendChild(table);
+    // yearpick.innerHTML = "";
+    // yearpick.appendChild(renderHead("year"));
+    // yearpick.appendChild(table);
     // </table>
+
+    return yearpicker;
   }
 
   function renderMonthPicker () {
@@ -260,9 +300,9 @@
     var month = 0;
 
     // <table>
-    var table = createElement("table");
+    var monthpicker = createElement("table");
     // <tbody>
-    table.appendChild(createElement("tbody"));
+    monthpicker.appendChild(createElement("tbody"));
 
     // <tr>
     row = createElement("tr");
@@ -300,7 +340,7 @@
       month++;
 
       if (++c === 3) {
-        table.firstChild.appendChild(row);
+        monthpicker.firstChild.appendChild(row);
         row = createElement("tr");
         c = 0;
       }
@@ -308,10 +348,12 @@
     }
     // <tbody>
 
-    monthpick.innerHTML = "";
-    monthpick.appendChild(renderHead("month"));
-    monthpick.appendChild(table);
+    // monthpick.innerHTML = "";
+    // monthpick.appendChild(renderHead("month"));
+    // monthpick.appendChild(table);
     // </table>
+
+    return monthpicker;
   }
 
   function renderDatePicker () {
@@ -336,10 +378,12 @@
       start -= 7;
     }
 
+    /* weekdays row */
+
     // <table>
-    var table = createElement("table");
+    var datepicker = createElement("table");
     // <thead>
-    table.appendChild(createElement("thead"));
+    datepicker.appendChild(createElement("thead"));
     // <tr>
     var head = createElement("tr");
 
@@ -350,7 +394,7 @@
       head.appendChild(weekday);
     }
     // </th>
-    table.firstChild.appendChild(head);
+    datepicker.firstChild.appendChild(head);
     // </tr>
 
     // <tr>
@@ -424,7 +468,7 @@
       // </td>
 
       if (++c === 7) {
-        table.firstChild.appendChild(row);
+        datepicker.firstChild.appendChild(row);
         row = createElement("tr");
         c = 0;
       }
@@ -432,17 +476,11 @@
     }
     // <thead>
 
-    datepick.innerHTML = "";
-    datepick.appendChild(renderHead("day"));
-    datepick.appendChild(table);
+    // datepick.innerHTML = "";
+    // datepick.appendChild(renderHead("day"));
+    // datepick.appendChild(table);
     // </table>
+
+    return datepicker;
   }
-
-  renderDatePicker();
-  renderMonthPicker();
-  renderYearPicker();
-
-  document.querySelector("main").appendChild(datepick);
-  document.querySelector("main").appendChild(monthpick);
-  document.querySelector("main").appendChild(yearpick);
 })(window, document);
