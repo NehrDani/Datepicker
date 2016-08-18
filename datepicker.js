@@ -20,7 +20,7 @@
 
   window.Datepicker = Datepicker;
 
-  function Datepicker (element, config) {
+  function Datepicker (element, config, callback) {
     this._date = new Date();
 
     this._state = {
@@ -34,13 +34,11 @@
     }, config);
 
 
-    this._container = createElement("div", {class: "datepicker"});
-    element.appendChild(this._container);
+    this.container = createElement("div", {class: "datepicker"});
+    element.appendChild(this.container);
     this._render("date");
 
-    // this.callback = function () {
-    //
-    // };
+    this.callback = callback;
   }
 
   Datepicker.prototype = {
@@ -51,12 +49,9 @@
     _renderDatePicker: renderDatePicker,
     _renderMonthPicker: renderMonthPicker,
     _renderYearPicker: renderYearPicker,
-    setDate: setDate
+    setDate: setDate,
+    destroy: destroy
   };
-
-  var datepicker = new Datepicker(document.querySelector("main"), {
-    firstDay: 1
-  });
 
   function setDate (d) {
     d = d.split("-");
@@ -65,7 +60,7 @@
     this._state.month = this._date.getMonth();
     this._state.year = this._date.getFullYear();
 
-    // this.callback();
+    this.callback(this._date);
     return;
   }
 
@@ -104,8 +99,8 @@
       break;
     }
 
-    this._container.innerHTML = "";
-    this._container.appendChild(fragment);
+    this.container.innerHTML = "";
+    this.container.appendChild(fragment);
   }
 
   function renderHead (view) {
@@ -524,5 +519,11 @@
 
   function getStartYear (year, range) {
     return parseInt((year - 1) / range) * range + 1;
+  }
+
+  function destroy () {
+    this.container.innerHTML = "";
+    this.container.parentNode.removeChild(this.container);
+    return;
   }
 })(window, document);

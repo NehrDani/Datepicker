@@ -4,12 +4,15 @@
   box-sizing: border-box;
 }
 .datepicker {
+  position: relative;
+  z-index: 100;
   width: 280px;
   padding: 4px;
   border: 1px solid #ccc;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #444;
   font-size: 14px;
+  background: #fff;
 }
 
 .datepicker .pick-head {

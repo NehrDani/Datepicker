@@ -4,13 +4,147 @@
   <meta charset="UTF-8">
   <title>Datepicker</title>
   <link rel="stylesheet" href="datepicker.css">
+  <style>
+    .container {
+      position: relative;
+    }
+  </style>
 </head>
 <body>
-  <main></main>
+  <main>
+    <div id="datepicker-focus">
+      <h2>Datepicker input onfocus</h2>
+      <form>
+        <input type="text" name="name" placeholder="Name">
+        <input type="text" name="mail" placeholder="Email">
+        <input type="password" name="pass" placeholder="Password">
+        <span class="container">
+          <input type="text" name="date" placeholder="Date">
+        </span>
+      </form>
+    </div>
+    <div id="datepicker-popup">
+      <h2>Datepicker popup button</h2>
+      <form>
+        <input type="text" name="name" placeholder="Name">
+        <input type="text" name="mail" placeholder="Email">
+        <input type="password" name="pass" placeholder="Password">
+        <span class="container">
+          <input type="text" name="date" placeholder="Date">
+          <button type="button" id="popup">Calendar</button>
+        </span>
+      </form>
+    </div>
+    <div id="datepicker-fix">
+      <h2>Datepicker fixed</h2>
+      <form>
+        <input type="text" name="name" placeholder="Name">
+        <input type="text" name="mail" placeholder="Email">
+        <input type="password" name="pass" placeholder="Password">
+        <input type="text" name="date" placeholder="Date">
+        <div class="container"></div>
+      </form>
+    </div>
+  </main>
 
   <script src="datepicker.js"></script>
   <script>
-    // console.clear();
+    document.addEventListener("DOMContentLoaded", function () {
+      onFocus();
+      popup();
+      fix();
+    });
+
+    function onFocus () {
+      var datepicker;
+      var demo = document.querySelector("#datepicker-focus");
+      var input = demo.querySelector("form").elements.date;
+      var container = input.parentNode;
+      var height = input.offsetHeight;
+
+      input.addEventListener("focus", function () {
+        datepicker = new Datepicker(container, {
+          firstDay: 1
+        }, function (date) {
+          input.value = dateFormat(date);
+          destroy(datepicker);
+          datepicker = null;
+        });
+        datepicker.container.style.position = "absolute";
+        datepicker.container.style.top = height;
+        datepicker.container.style.left = 0;
+        datepicker.container.addEventListener("mousedown", blockElement);
+      });
+
+      input.addEventListener("blur", function () {
+        destroy(datepicker);
+        datepicker = null;
+      });
+    }
+
+    function popup () {
+      var datepicker;
+      var demo = document.querySelector("#datepicker-popup");
+      var button = demo.querySelector("#popup");
+      var input = demo.querySelector("form").elements.date;
+      var container = button.parentNode;
+      var height = button.offsetHeight;
+
+      button.addEventListener("focus", function (e) {
+        e.preventDefault();
+
+        datepicker = new Datepicker(container, {
+          firstDay: 1
+        }, function (date) {
+          input.value = dateFormat(date);
+          destroy(datepicker);
+          datepicker = null;
+        });
+        datepicker.container.style.position = "absolute";
+        datepicker.container.style.top = height;
+        datepicker.container.style.left = 0;
+        datepicker.container.addEventListener("mousedown", blockElement);
+      });
+
+      button.addEventListener("blur", function (e) {
+        e.preventDefault();
+        destroy(datepicker);
+        datepicker = null;
+      });
+    }
+
+    function fix () {
+      var datepicker;
+      var demo = document.querySelector("#datepicker-fix");
+      var input = demo.querySelector("form").elements.date;
+      var container = demo.querySelector(".container");
+
+      datepicker = new Datepicker(container, {
+        firstDay: 1
+      }, function (date) {
+        input.value = dateFormat(date);
+      });
+    }
+
+    function dateFormat (date) {
+      return date.getFullYear() + "-" +
+        ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+        ("0" + date.getDate()).slice(-2);
+    }
+
+    function blockElement (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    function destroy (datepicker) {
+      if (datepicker) {
+        datepicker.container.removeEventListener("mouseup", blockElement);
+        datepicker.container.removeEventListener("mousedown", blockElement);
+        datepicker.destroy();
+      }
+    }
   </script>
 </body>
 </html>
