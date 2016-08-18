@@ -93,23 +93,26 @@
   }
 
   function render (view) {
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(this._renderHead(view));
+    if (view) {
+      var fragment = document.createDocumentFragment();
+      fragment.appendChild(this._renderHead(view));
 
-    switch (view) {
-    case "date":
-      fragment.appendChild(this._renderDatePicker());
-      break;
-    case "month":
-      fragment.appendChild(this._renderMonthPicker());
-      break;
-    case "year":
-      fragment.appendChild(this._renderYearPicker());
-      break;
+      switch (view) {
+      case "date":
+        fragment.appendChild(this._renderDatePicker());
+        break;
+      case "month":
+        fragment.appendChild(this._renderMonthPicker());
+        break;
+      case "year":
+        fragment.appendChild(this._renderYearPicker());
+        break;
+      }
+
+      this.container.innerHTML = "";
+      this.container.appendChild(fragment);
     }
-
-    this.container.innerHTML = "";
-    this.container.appendChild(fragment);
+    return;
   }
 
   function renderHead (view) {
