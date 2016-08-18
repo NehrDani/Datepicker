@@ -78,7 +78,8 @@
   }
 
   Datepicker.prototype = {
-    _render: render
+    _render: render,
+    setDate: setDate
   };
 
   // var datepicker = new Datepicker(document.querySelector("main"));
@@ -133,19 +134,29 @@
     return WEEKDAYS[i];
   }
 
-  function callback () {
-    alert(date);
-  }
+  function callback () {}
+
+  // function setState (type, value) {
+  //   switch (type) {
+  //   case "date":
+  //     setDate(value);
+  //     break;
+  //   case "month":
+  //     break;
+  //   case "year":
+  //     break;
+  //   }
+  // }
 
   function setDate (d) {
     d = d.split("-");
-    date = new Date(d[0], d[1], d[2]);
+    date = new Date(parseInt(d[0]), parseInt(d[1]), parseInt(d[2]));
     state.day = date.getDate();
     state.month = date.getMonth();
     state.year = date.getFullYear();
-    state.picker = "date";
+    // state.picker = "date";
 
-    render(state.picker);
+    // render(state.picker);
 
     callback();
     return;
@@ -162,17 +173,17 @@
     } else {
       state.month = month;
     }
-    state.picker = "date";
+    // state.picker = "date";
 
-    render(state.picker);
+    // render(state.picker);
     return;
   }
 
   function setYear (year) {
     state.year = parseInt(year) > 0 ? parseInt(year) : 0;
 
-    state.picker = "month";
-    render(state.picker);
+    // state.picker = "month";
+    // render(state.picker);
     return;
   }
 
@@ -200,12 +211,15 @@
       switch (view) {
       case "date":
         setMonth(state.month - 1);
+        render("date");
         break;
       case "month":
         setYear(state.year - 1);
+        render("month");
         break;
       case "year":
         setYear(state.year - 25);
+        render("year");
         break;
       }
     });
@@ -256,12 +270,15 @@
       switch (view) {
       case "date":
         setMonth(state.month + 1);
+        render("date");
         break;
       case "month":
         setYear(state.year + 1);
+        render("month");
         break;
       case "year":
         setYear(state.year + 25);
+        render("year");
         break;
       }
     });
@@ -305,6 +322,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setYear(this.value);
+        render("date");
       });
 
       col.appendChild(btn);
@@ -365,6 +383,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setMonth(this.value);
+        render("date");
       });
 
       col.appendChild(btn);
@@ -495,6 +514,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setDate(this.value);
+        render("date");
       });
 
       col.appendChild(btn);
