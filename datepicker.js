@@ -1,6 +1,10 @@
 (function (window, document, undefined) {
+  var _lang = window.lang;
+
   /* constants */
   var YEARS_RANGE = 25;
+  var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
   var MONTHS = [
     "January",
     "February",
@@ -16,7 +20,11 @@
     "December"
   ];
   var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+  if (_lang !== undefined) {
+    MONTHS = _lang.months || MONTHS;
+    WEEKDAYS = _lang.weekdays || WEEKDAYS;
+  }
 
   window.Datepicker = Datepicker;
 
