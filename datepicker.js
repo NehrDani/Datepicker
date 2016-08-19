@@ -3,7 +3,6 @@
   /* constants */
   var YEARS_RANGE = 25;
   var DAYS_IN_MONTH = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-
   var MONTHS = [
     "January",
     "February",
@@ -29,25 +28,35 @@
 
   window.Datepicker = Datepicker;
 
-  function Datepicker (element, config, callback) {
-    this._date = new Date();
+  function Datepicker (container) {
+    var options = {};
+
+    if (typeof arguments[1] === "object") {
+      options = arguments[1];
+      if (typeof arguments[2] === "function")
+        this._onChange = arguments[2];
+    } else if (typeof arguments[1] === "function")
+      this._onChange = arguments[1];
+
+    this.date = new Date();
 
     this._state = {
       view: "date",
-      year: this._date.getFullYear(),
-      month: this._date.getMonth(),
-      day: this._date.getDate()
+      year: this.date.getFullYear(),
+      month: this.date.getMonth(),
+      day: this.date.getDate()
     };
 
     this._config = extend({
       firstDay: 0
-    }, config);
+    }, options);
 
-    this.container = createElement("div", {class: "datepicker"});
-    element.appendChild(this.container);
+    // create datepicker node and append it to the container
+    this.element = createElement("div", {class: "datepicker"});
+    container.appendChild(this.element);
+
+    // initial rendering
     this._render();
-
-    this.callback = callback;
   }
 
   Datepicker.prototype = {
@@ -90,18 +99,23 @@
       this.setDate(
         new Date(this._state.year, this._state.month, this._state.day)
       );
-      this.callback(this._date);
+      if (typeof this._onChange === "function")
+        this._onChange(this.date);
+      return;
     }
 
     this._render();
+    return;
   }
 
   function setDate (date) {
-    this._date = new Date(date);
-    this._state.day = this._date.getDate();
-    this._state.month = this._date.getMonth();
-    this._state.year = this._date.getFullYear();
-    return this._date;
+    this.date = new Date(date);
+    this._state.day = this.date.getDate();
+    this._state.month = this.date.getMonth();
+    this._state.year = this.date.getFullYear();
+
+    this._render();
+    return this.date;
   }
 
   function render () {
@@ -113,26 +127,26 @@
     case "date":
       fragment.appendChild(renderDatePicker({
         state: this._state,
-        active: this._date,
+        active: this.date,
         firstDay: this._config.firstDay
       }, setState));
       break;
     case "month":
       fragment.appendChild(renderMonthPicker({
         state: this._state,
-        active: this._date
+        active: this.date
       }, setState));
       break;
     case "year":
       fragment.appendChild(renderYearPicker({
         state: this._state,
-        active: this._date
+        active: this.date
       }, setState));
       break;
     }
 
-    this.container.innerHTML = "";
-    this.container.appendChild(fragment);
+    this.element.innerHTML = "";
+    this.element.appendChild(fragment);
     return true;
   }
 
