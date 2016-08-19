@@ -9,10 +9,10 @@
   width: 280px;
   padding: 4px;
   border: 1px solid #ccc;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #444;
   font-size: 14px;
   background: #fff;
+  box-shadow:0 1px 2px 1px #ccc;
 }
 
 .datepicker .pick-head {
@@ -41,6 +41,7 @@
 
 .datepicker table td, .datepicker table th {
   padding: 0;
+  text-align: center;
 }
 
 .datepicker table thead {
