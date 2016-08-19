@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <title>Datepicker</title>
   <link rel="stylesheet" href="datepicker.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
   <style>
-    .container {
+    .picker {
       position: relative;
     }
   </style>
@@ -18,7 +19,7 @@
         <input type="text" name="name" placeholder="Name">
         <input type="text" name="mail" placeholder="Email">
         <input type="password" name="pass" placeholder="Password">
-        <span class="container">
+        <span class="picker">
           <input type="text" name="date" placeholder="Date">
         </span>
       </form>
@@ -29,7 +30,7 @@
         <input type="text" name="name" placeholder="Name">
         <input type="text" name="mail" placeholder="Email">
         <input type="password" name="pass" placeholder="Password">
-        <span class="container">
+        <span class="picker">
           <input type="text" name="date" placeholder="Date">
           <button type="button" id="popup">Calendar</button>
         </span>
@@ -42,7 +43,7 @@
         <input type="text" name="mail" placeholder="Email">
         <input type="password" name="pass" placeholder="Password">
         <input type="text" name="date" placeholder="Date">
-        <div class="container"></div>
+        <div class="picker"></div>
       </form>
     </div>
   </main>
@@ -56,77 +57,71 @@
     });
 
     function onFocus () {
-      var datepicker;
       var demo = document.querySelector("#datepicker-focus");
       var input = demo.querySelector("form").elements.date;
       var container = input.parentNode;
       var height = input.offsetHeight;
 
+      var datepicker = datepicker = new Datepicker(container, {}, function (date) {
+        input.value = dateFormat(date);
+      });
+
+      datepicker.container.style.display = "none";
+      datepicker.container.style.position = "absolute";
+      datepicker.container.style.top = height;
+      datepicker.container.style.left = 0;
+      datepicker.container.addEventListener("mousedown", blockElement);
+
       input.addEventListener("focus", function () {
-        datepicker = new Datepicker(container, {
-          firstDay: 1
-        }, function (date) {
-          input.value = dateFormat(date);
-          destroy(datepicker);
-          datepicker = null;
-        });
-        datepicker.container.style.position = "absolute";
-        datepicker.container.style.top = height;
-        datepicker.container.style.left = 0;
-        datepicker.container.addEventListener("mousedown", blockElement);
+        datepicker.container.style.display = "block";
       });
 
       input.addEventListener("blur", function () {
-        destroy(datepicker);
-        datepicker = null;
+        datepicker.container.style.display = "none";
       });
     }
 
     function popup () {
-      var datepicker;
       var demo = document.querySelector("#datepicker-popup");
       var button = demo.querySelector("#popup");
       var input = demo.querySelector("form").elements.date;
       var container = button.parentNode;
       var height = button.offsetHeight;
 
-      button.addEventListener("focus", function (e) {
-        e.preventDefault();
-
-        datepicker = new Datepicker(container, {
-          firstDay: 1
-        }, function (date) {
-          input.value = dateFormat(date);
-          destroy(datepicker);
-          datepicker = null;
-        });
-        datepicker.container.style.position = "absolute";
-        datepicker.container.style.top = height;
-        datepicker.container.style.left = 0;
-        datepicker.container.addEventListener("mousedown", blockElement);
+      var datepicker = datepicker = new Datepicker(container, {}, function (date) {
+        input.value = dateFormat(date);
       });
 
-      button.addEventListener("blur", function (e) {
-        e.preventDefault();
-        destroy(datepicker);
-        datepicker = null;
+      datepicker.container.style.display = "none";
+      datepicker.container.style.position = "absolute";
+      datepicker.container.style.top = height;
+      datepicker.container.style.left = 0;
+      datepicker.container.addEventListener("mousedown", blockElement);
+
+      button.addEventListener("focus", function () {
+        datepicker.container.style.display = "block";
+      });
+
+      button.addEventListener("blur", function () {
+        datepicker.container.style.display = "none";
       });
     }
 
     function fix () {
-      var datepicker;
       var demo = document.querySelector("#datepicker-fix");
       var input = demo.querySelector("form").elements.date;
-      var container = demo.querySelector(".container");
+      var container = demo.querySelector(".picker");
 
-      datepicker = new Datepicker(container, {
-        firstDay: 1
-      }, function (date) {
+      var datepicker = new Datepicker(container, {}, function (date) {
         input.value = dateFormat(date);
       });
     }
 
-    function dateFormat (date) {
+    function dateFormat (date, reverse) {
+      if (reverse) {
+        date = date.split("-");
+        return new Date(+date[0], +date[1], +date[2])
+      }
       return date.getFullYear() + "-" +
         ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
         ("0" + date.getDate()).slice(-2);
