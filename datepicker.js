@@ -31,6 +31,7 @@
   function Datepicker (container) {
     var options = {};
 
+    // dynamic and optional paramters
     if (typeof arguments[1] === "object") {
       options = arguments[1];
       if (typeof arguments[2] === "function")
@@ -47,8 +48,15 @@
       day: this.date.getDate()
     };
 
+    /* options:
+    - firstDay[int] (Default: 0) - first day in week
+    - minDate[Date] (Default: null) - minimum available Date
+    - mxDate[Date] (Default: null) - maximum available Date
+    */
     this._config = extend({
-      firstDay: 0
+      firstDay: 0,
+      minDate: null,
+      maxDate: null
     }, options);
 
     // create datepicker node and append it to the container
@@ -128,7 +136,9 @@
       fragment.appendChild(renderDatePicker({
         state: this._state,
         active: this.date,
-        firstDay: this._config.firstDay
+        firstDay: this._config.firstDay,
+        minDate: this._config.minDate,
+        maxDate: this._config.maxDate
       }, setState));
       break;
     case "month":
@@ -377,6 +387,8 @@
     var state = options.state;
     var firstDay = options.firstDay;
     var active = options.active;
+    var minDate = options.minDate;
+    var maxDate = options.maxDate;
 
     var row, col, btn;
     var day = 0, month = 0, year = 0;
@@ -459,6 +471,13 @@
       */
       if (i < before || i >= (daysInMonth + before)) {
         btn.classList.add("out");
+      }
+
+      // disable dates depending on min and max dates
+      if ((minDate && date < minDate) ||
+      (maxDate && date > maxDate)) {
+        btn.classList.add("disabled");
+        btn.setAttribute("disabled", true);
       }
 
       // set active if selected day
