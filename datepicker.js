@@ -49,9 +49,9 @@
     };
 
     /* options:
-    - firstDay[int] (Default: 0) - first day in week
-    - minDate[Date] (Default: null) - minimum available Date
-    - mxDate[Date] (Default: null) - maximum available Date
+      - firstDay[int] (Default: 0) - first day in week
+      - minDate[Date] (Default: null) - minimum available Date
+      - mxDate[Date] (Default: null) - maximum available Date
     */
     this._config = extend({
       firstDay: 0,
@@ -136,21 +136,21 @@
       fragment.appendChild(renderDatePicker({
         state: this._state,
         active: this.date,
-        firstDay: this._config.firstDay,
-        minDate: this._config.minDate,
-        maxDate: this._config.maxDate
+        config: this._config
       }, setState));
       break;
     case "month":
       fragment.appendChild(renderMonthPicker({
         state: this._state,
-        active: this.date
+        active: this.date,
+        config: this._config
       }, setState));
       break;
     case "year":
       fragment.appendChild(renderYearPicker({
         state: this._state,
-        active: this.date
+        active: this.date,
+        config: this._config
       }, setState));
       break;
     }
@@ -259,10 +259,14 @@
   function renderYearPicker (options, setState) {
     // bindings
     var state = options.state;
-    var active = options.active;
+    var active = {
+      year: options.active.getFullYear()
+    };
+    var minDate = options.config.minDate;
+    var maxDate = options.config.maxDate;
 
     var row, col, btn;
-    var year = getStartYear(state.year, YEARS_RANGE);
+    var year = getStartYear(state.year, YEARS_RANGE), date;
 
     // <table>
     var yearpicker = createElement("table");
@@ -273,6 +277,8 @@
     row = createElement("tr");
 
     for (var r = 0, c = 0; r < YEARS_RANGE; r++) {
+      date = new Date(year, 11);
+
       // </td>
       col = createElement("td");
       // <button type="button" class="pick-btn pick-year" value={year}>
@@ -284,8 +290,15 @@
       // text
       btn.innerHTML = year;
 
+      // disable year depending on min and max dates
+      if ((minDate && date < minDate) ||
+      (maxDate && date > maxDate)) {
+        btn.className += " disabled";
+        btn.setAttribute("disabled", true);
+      }
+
       // active if selected year
-      if (active.getFullYear() === year) {
+      if (active.year === year) {
         btn.className += " active";
       }
 
@@ -321,10 +334,15 @@
   function renderMonthPicker (options, setState) {
     // bindings
     var state = options.state;
-    var active = options.active;
+    var active = {
+      year: options.active.getFullYear(),
+      month: options.active.getMonth()
+    };
+    var minDate = options.config.minDate;
+    var maxDate = options.config.maxDate;
 
     var row, col, btn;
-    var month = 0;
+    var year = state.year, month = 0, date;
 
     // <table>
     var monthpicker = createElement("table");
@@ -335,6 +353,8 @@
     row = createElement("tr");
 
     for (var r = 0, c = 0; r < 12; r++) {
+      date = new Date(state.year, month, getDaysInMonth(state.year, month));
+
       // <td>
       col = createElement("td");
       // <button type="button" class="pick-btn pick-month" value={month}>
@@ -346,10 +366,17 @@
       // text
       btn.innerHTML = MONTHS[month];
 
-      // set active if selected month
-      if (active.getMonth() === month &&
-      active.getFullYear() === state.year) {
-        btn.classList.add("active");
+      // disable month depending on min and max dates
+      if ((minDate && date < minDate) ||
+      (maxDate && date > maxDate)) {
+        btn.className += " disabled";
+        btn.setAttribute("disabled", true);
+      }
+
+      // set month to active if selected
+      if (active.month === month &&
+      active.year === year) {
+        btn.className += " active";
       }
 
       // bind event
@@ -385,18 +412,20 @@
   function renderDatePicker (options, setState) {
     // bindings
     var state = options.state;
-    var firstDay = options.firstDay;
-    var active = options.active;
-    var minDate = options.minDate;
-    var maxDate = options.maxDate;
+    var active = {
+      year: options.active.getFullYear(),
+      month: options.active.getMonth(),
+      day: options.active.getDate()
+    };
+    var firstDay = options.config.firstDay;
+    var minDate = options.config.minDate;
+    var maxDate = options.config.maxDate;
 
-    var row, col, btn;
-    var day = 0, month = 0, year = 0;
-    var start = 0;
-    var weekday, week;
+    var row, col, btn, weekday, week;
+    var day = 0, month = 0, year = 0, date;
     var daysInMonth = getDaysInMonth(state.year, state.month);
-    var before = new Date(state.year, state.month, 1).getDay();
-    before -= firstDay;
+    var before = new Date(state.year, state.month, 1).getDay() - firstDay;
+    var start = 0;
 
     /*
     If week doesnt start on day 0
@@ -441,7 +470,7 @@
 
     // <td> / <th>
     for (var i = start, c = 0; i < (42 + start); i++) {
-      var date = new Date(state.year, state.month, 1 + (i - before));
+      date = new Date(state.year, state.month, 1 + (i - before));
       day = date.getDate();
       month = date.getMonth();
       year = date.getFullYear();
@@ -465,26 +494,23 @@
         class: "pick-btn pick-day"
       });
 
-      /*
-      if day is is outside selected month
-      set button to out
-      */
+      // mark dates outside selected month
       if (i < before || i >= (daysInMonth + before)) {
-        btn.classList.add("out");
+        btn.className += " out";
       }
 
       // disable dates depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn.classList.add("disabled");
+        btn.className += " disabled";
         btn.setAttribute("disabled", true);
       }
 
-      // set active if selected day
-      if (active.getDate() === day &&
-      active.getMonth() === month &&
-      active.getFullYear() === year) {
-        btn.classList.add("active");
+      // set date to active if selected day
+      if (active.day === day &&
+      active.month === month &&
+      active.year === year) {
+        btn.className += " active";
       }
 
       // text

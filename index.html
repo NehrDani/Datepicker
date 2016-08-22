@@ -40,6 +40,7 @@
       var demo = document.querySelector("#datepicker-fixed");
       var input = demo.querySelector("input");
       var container = demo.querySelector(".calendar");
+      var date = new Date();
 
       var datepicker = new Datepicker(container, function (date) {
         input.value = formatDate(date);

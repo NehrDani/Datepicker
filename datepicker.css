@@ -73,12 +73,6 @@
 .pick-btn:active {
   box-shadow: inset 0 1px 2px 1px #ccc;
 }
-.pick-btn.disabled {
-  opacity: .5;
-  background-color: inherit;
-  cursor: not-allowed;
-  box-shadow: none;
-}
 
 .pick-day {}
 .pick-day.active {
@@ -88,15 +82,33 @@
 .pick-day.out {
   color: #ccc;
 }
+.pick-day.disabled {
+  opacity: .5;
+  background-color: inherit;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 .pick-month {}
 .pick-month.active {
   color: rgb(0, 100, 200);
   font-weight: bold;
 }
+.pick-month.disabled {
+  opacity: .5;
+  background-color: inherit;
+  cursor: not-allowed;
+  box-shadow: none;
+}
 
 .pick-year {}
 .pick-year.active {
   color: rgb(0, 100, 200);
   font-weight: bold;
+}
+.pick-year.disabled {
+  opacity: .5;
+  background-color: inherit;
+  cursor: not-allowed;
+  box-shadow: none;
 }
