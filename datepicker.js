@@ -1,3 +1,4 @@
+// TODO finish customDate, finish disableDate
 (function (window, document, undefined) {
 
   /* constants */
@@ -49,14 +50,27 @@
     };
 
     /* options:
-      - firstDay[int] (Default: 0) - first day in week
-      - minDate[Date] (Default: null) - minimum available Date
-      - mxDate[Date] (Default: null) - maximum available Date
+      * firstDay[Int] (Default: 0) - first day in week
+      * minDate[Date] (Default: null) - minimum available Date
+      * maxDate[Date] (Default: null) - maximum available Date
+      * disableDates[Function] (date: Date)
+        - function to disable a date and add options based on passed Date
+      * customDate[Function] (date: Date)
+        - function to add classes and titles to a date
+        based on passed Date and options
     */
     this._config = extend({
       firstDay: 0,
       minDate: null,
-      maxDate: null
+      maxDate: null,
+      customDate: function (date) {
+        if (date > new Date()) {
+          return {
+            class: "future",
+            title: "future"
+          };
+        }
+      }
     }, options);
 
     // create datepicker node and append it to the container
@@ -420,12 +434,13 @@
     var firstDay = options.config.firstDay;
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
+    var customDate = options.config.customDate;
 
     var row, col, btn, weekday, week;
     var day = 0, month = 0, year = 0, date;
     var daysInMonth = getDaysInMonth(state.year, state.month);
     var before = new Date(state.year, state.month, 1).getDay() - firstDay;
-    var start = 0;
+    var start = 0, custom;
 
     /*
     If week doesnt start on day 0
@@ -517,6 +532,15 @@
       btn.innerHTML = day;
       // value
       btn.value = year + "-" + month + "-" + day;
+
+      // add custom options
+      custom = customDate(date);
+      if (custom) {
+        if (custom.class)
+          btn.className += " " + custom.class;
+        if (custom.title)
+          btn.setAttribute("title", custom.title);
+      }
 
       // add event
       btn.addEventListener("click", function (e) {
