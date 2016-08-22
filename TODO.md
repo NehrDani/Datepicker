@@ -1,8 +1,8 @@
 ### Core
-- [ ] disable date(s) on defined expression
+- [ ] disable date(s) based on optional expression
 - [x] min date
 - [x] max date
-- [ ] mark dates with style and title on defined expression
+- [x] customize date(s) with classes and title based on optional expression
 - [ ] add more comments and docs in code
 
 ### API
@@ -13,6 +13,8 @@
 - [ ] add examples for show / hide Datepicker
   - [ ] bind on button
   - [ ] bind on input
+- [ ] add customizeDate example
+- [ ] add disableDate example
 
 ### Extras (eventually)
 - [ ] wrapper for jQuery

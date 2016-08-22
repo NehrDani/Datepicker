@@ -53,24 +53,16 @@
       * firstDay[Int] (Default: 0) - first day in week
       * minDate[Date] (Default: null) - minimum available Date
       * maxDate[Date] (Default: null) - maximum available Date
-      * disableDates[Function] (date: Date)
-        - function to disable a date and add options based on passed Date
-      * customDate[Function] (date: Date)
-        - function to add classes and titles to a date
-        based on passed Date and options
+      * disableDate[Function] ({date: Date, mode: String})
+        - function to disable dates based on passed date and current mode
+      * customizeDate[Function] ({date: Date, mode String})
+        - function to add classes and title to dates
+        based on passed date and current mode
     */
     this._config = extend({
       firstDay: 0,
       minDate: null,
-      maxDate: null,
-      customDate: function (date) {
-        if (date > new Date()) {
-          return {
-            class: "future",
-            title: "future"
-          };
-        }
-      }
+      maxDate: null
     }, options);
 
     // create datepicker node and append it to the container
@@ -278,6 +270,7 @@
     };
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
+    var customizeDate = options.config.customizeDate;
 
     var row, col, btn;
     var year = getStartYear(state.year, YEARS_RANGE), date;
@@ -314,6 +307,11 @@
       // active if selected year
       if (active.year === year) {
         btn.className += " active";
+      }
+
+      // add customize options
+      if (typeof customizeDate === "function") {
+        btn = setCustom(btn, customizeDate({date: date, mode: "year"}));
       }
 
       // add event
@@ -354,6 +352,7 @@
     };
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
+    var customizeDate = options.config.customizeDate;
 
     var row, col, btn;
     var year = state.year, month = 0, date;
@@ -391,6 +390,11 @@
       if (active.month === month &&
       active.year === year) {
         btn.className += " active";
+      }
+
+      // add customize options
+      if (typeof customizeDate === "function") {
+        btn = setCustom(btn, customizeDate({date: date, mode: "month"}));
       }
 
       // bind event
@@ -434,13 +438,13 @@
     var firstDay = options.config.firstDay;
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
-    var customDate = options.config.customDate;
+    var customizeDate = options.config.customizeDate;
 
     var row, col, btn, weekday, week;
     var day = 0, month = 0, year = 0, date;
     var daysInMonth = getDaysInMonth(state.year, state.month);
     var before = new Date(state.year, state.month, 1).getDay() - firstDay;
-    var start = 0, custom;
+    var start = 0;
 
     /*
     If week doesnt start on day 0
@@ -533,13 +537,9 @@
       // value
       btn.value = year + "-" + month + "-" + day;
 
-      // add custom options
-      custom = customDate(date);
-      if (custom) {
-        if (custom.class)
-          btn.className += " " + custom.class;
-        if (custom.title)
-          btn.setAttribute("title", custom.title);
+      // add customize options
+      if (typeof customizeDate === "function") {
+        btn = setCustom(btn, customizeDate({date: date, mode: "date"}));
       }
 
       // add event
@@ -628,7 +628,7 @@
     return parseInt((year - 1) / range) * range + 1;
   }
 
-  function getWeekNumber(date) {
+  function getWeekNumber (date) {
     var checkDate = new Date(date);
     // set to Thursday
     checkDate.setDate(checkDate.getDate() + 4 - (checkDate.getDay() || 7));
@@ -637,6 +637,17 @@
     checkDate.setMonth(0);
     checkDate.setDate(1);
     return Math.floor(Math.round((time - checkDate) / 864e5) / 7) + 1;
+  }
+
+  function setCustom (btn, options) {
+    if (options) {
+      if (options.class)
+        btn.className += " " + options.class;
+      if (options.title)
+        btn.setAttribute("title", options.title);
+    }
+
+    return btn;
   }
 
   function destroy () {
