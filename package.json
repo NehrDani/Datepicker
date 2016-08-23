@@ -1,8 +1,18 @@
 {
   "name": "datepicker",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "a vanilla js datepicker with no dependencies",
-  "keywords": ["datepicker", "vanilla", "js"],
+  "scripts": {
+    "uglify": "uglifyjs --compress --mangle -o datepicker.min.js datepicker.js"
+  },
+  "keywords": [
+    "datepicker",
+    "vanilla",
+    "js"
+  ],
   "author": "Daniel Nehring",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "uglify-js": "^2.7.3"
+  }
 }

@@ -1,4 +1,3 @@
-// TODO finish customDate, finish disableDate
 (function (window, document, undefined) {
 
   /* constants */
@@ -50,20 +49,12 @@
       day: this.date.getDate()
     };
 
-    /* options:
-      * firstDay[Int] (Default: 0) - first day in week
-      * minDate[Date] (Default: null) - minimum available Date
-      * maxDate[Date] (Default: null) - maximum available Date
-      * disableDate[Function] ({date: Date, mode: String})
-        - function to disable dates based on passed date and current mode
-      * customizeDate[Function] ({date: Date, mode String})
-        - function to add classes and title to dates
-        based on passed date and current mode
-    */
     this._config = extend({
       firstDay: 0,
       minDate: null,
-      maxDate: null
+      maxDate: null,
+      customizeDate: null,
+      disableDate: null
     }, options);
 
     // create datepicker node and append it to the container
@@ -274,6 +265,7 @@
     var customizeDate = options.config.customizeDate;
     var disableDate = options.config.disableDate;
 
+    // variables
     var row, col, btn;
     var year = getStartYear(state.year, YEARS_RANGE), date;
 
@@ -317,9 +309,13 @@
         btn.className += " active";
       }
 
-      // add customize options
+      // add customize options based on function return
       if (typeof customizeDate === "function") {
-        btn = setCustom(btn, customizeDate({date: date, mode: "year"}));
+        btn = setCustom(btn, customizeDate({date: date, mode: "date"}));
+      }
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        btn = setDisabled(btn, disableDate({date: date, mode: "date"}));
       }
 
       // add event
@@ -339,6 +335,7 @@
       year++;
       // </tr>
 
+      // add row after 5 cols
       if (++c === 5) {
         yearpicker.firstChild.appendChild(row);
         row = createElement("tr");
@@ -363,6 +360,7 @@
     var customizeDate = options.config.customizeDate;
     var disableDate = options.config.disableDate;
 
+    // variables
     var row, col, btn;
     var year = state.year, month = 0, date;
 
@@ -391,14 +389,7 @@
       // disable month depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn = setDisabled(btn);
-      }
-
-      // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        if (disableDate({date: date, mode: "month"})) {
-          btn = setDisabled(btn);
-        }
+        btn = setDisabled(btn, true);
       }
 
       // set month to active if selected
@@ -407,9 +398,13 @@
         btn.className += " active";
       }
 
-      // add customize options
+      // add customize options based on function return
       if (typeof customizeDate === "function") {
         btn = setCustom(btn, customizeDate({date: date, mode: "month"}));
+      }
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        btn = setDisabled(btn, disableDate({date: date, mode: "month"}));
       }
 
       // bind event
@@ -429,6 +424,7 @@
 
       month++;
 
+      // add row after 3 cols
       if (++c === 3) {
         monthpicker.firstChild.appendChild(row);
         row = createElement("tr");
@@ -456,6 +452,7 @@
     var customizeDate = options.config.customizeDate;
     var disableDate = options.config.disableDate;
 
+    // variables
     var row, col, btn, weekday, week;
     var day = 0, month = 0, year = 0, date;
     var daysInMonth = getDaysInMonth(state.year, state.month);
@@ -537,14 +534,7 @@
       // disable dates depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn = setDisabled(btn);
-      }
-
-      // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        if (disableDate({date: date, mode: "day"})) {
-          btn = setDisabled(btn);
-        }
+        btn = setDisabled(btn, true);
       }
 
       // set date to active if selected day
@@ -559,9 +549,13 @@
       // value
       btn.value = year + "-" + month + "-" + day;
 
-      // add customize options
+      // add customize options based on function return
       if (typeof customizeDate === "function") {
         btn = setCustom(btn, customizeDate({date: date, mode: "date"}));
+      }
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        btn = setDisabled(btn, disableDate({date: date, mode: "date"}));
       }
 
       // add event
@@ -581,6 +575,7 @@
       row.appendChild(col);
       // </td>
 
+      // add row after 7 cols
       if (++c === 7) {
         body.appendChild(row);
         row = createElement("tr");
@@ -668,13 +663,14 @@
       if (options.title)
         btn.setAttribute("title", options.title);
     }
-
     return btn;
   }
 
-  function setDisabled (btn) {
-    btn.className += " disabled";
-    btn.setAttribute("disabled", true);
+  function setDisabled (btn, status) {
+    if (status === true) {
+      btn.className += " disabled";
+      btn.setAttribute("disabled", true);
+    }
     return btn;
   }
 
