@@ -27,6 +27,7 @@
     WEEKDAYS = _lang.weekdays || WEEKDAYS;
   }
 
+  // making global
   window.Datepicker = Datepicker;
 
   function Datepicker (container) {
@@ -43,7 +44,7 @@
     this.date = new Date();
 
     this._state = {
-      view: "date",
+      mode: "date",
       year: this.date.getFullYear(),
       month: this.date.getMonth(),
       day: this.date.getDate()
@@ -102,9 +103,9 @@
       case "day":
         this._state.day = parseInt(state[option]);
         break;
-      case "view":
+      case "mode":
         if (state[option])
-          this._state.view = state[option];
+          this._state.mode = state[option];
         break;
       }
     }
@@ -137,7 +138,7 @@
     var fragment = document.createDocumentFragment();
     fragment.appendChild(renderHead(this._state, setState));
 
-    switch (this._state.view) {
+    switch (this._state.mode) {
     case "date":
       fragment.appendChild(renderDatePicker({
         state: this._state,
@@ -199,7 +200,7 @@
     // add event
     change.addEventListener("click", function (e) {
       e.preventDefault();
-      setState({view: this.value});
+      setState({mode: this.value});
     });
     head.appendChild(change);
     // </button>
@@ -224,7 +225,7 @@
     // </div>
 
     // text / value for buttons
-    switch (state.view) {
+    switch (state.mode) {
     case "date":
       prev.name = "month";
       prev.value = state.month - 1;
@@ -271,6 +272,7 @@
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
     var customizeDate = options.config.customizeDate;
+    var disableDate = options.config.disableDate;
 
     var row, col, btn;
     var year = getStartYear(state.year, YEARS_RANGE), date;
@@ -300,8 +302,14 @@
       // disable year depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn.className += " disabled";
-        btn.setAttribute("disabled", true);
+        btn = setDisabled(btn);
+      }
+
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        if (disableDate({date: date, mode: "year"})) {
+          btn = setDisabled(btn);
+        }
       }
 
       // active if selected year
@@ -318,7 +326,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setState({
-          view: "month",
+          mode: "month",
           year: this.value
         });
       });
@@ -353,6 +361,7 @@
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
     var customizeDate = options.config.customizeDate;
+    var disableDate = options.config.disableDate;
 
     var row, col, btn;
     var year = state.year, month = 0, date;
@@ -382,8 +391,14 @@
       // disable month depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn.className += " disabled";
-        btn.setAttribute("disabled", true);
+        btn = setDisabled(btn);
+      }
+
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        if (disableDate({date: date, mode: "month"})) {
+          btn = setDisabled(btn);
+        }
       }
 
       // set month to active if selected
@@ -401,7 +416,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setState({
-          view: "date",
+          mode: "date",
           month: this.value
         });
       });
@@ -439,6 +454,7 @@
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
     var customizeDate = options.config.customizeDate;
+    var disableDate = options.config.disableDate;
 
     var row, col, btn, weekday, week;
     var day = 0, month = 0, year = 0, date;
@@ -521,8 +537,14 @@
       // disable dates depending on min and max dates
       if ((minDate && date < minDate) ||
       (maxDate && date > maxDate)) {
-        btn.className += " disabled";
-        btn.setAttribute("disabled", true);
+        btn = setDisabled(btn);
+      }
+
+      // disabled dates based on function return
+      if (typeof disableDate === "function") {
+        if (disableDate({date: date, mode: "day"})) {
+          btn = setDisabled(btn);
+        }
       }
 
       // set date to active if selected day
@@ -647,6 +669,12 @@
         btn.setAttribute("title", options.title);
     }
 
+    return btn;
+  }
+
+  function setDisabled (btn) {
+    btn.className += " disabled";
+    btn.setAttribute("disabled", true);
     return btn;
   }
 

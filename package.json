@@ -1,6 +1,6 @@
 {
   "name": "datepicker",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "description": "a vanilla js datepicker with no dependencies",
   "keywords": ["datepicker", "vanilla", "js"],
   "author": "Daniel Nehring",

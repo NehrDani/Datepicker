@@ -1,5 +1,5 @@
 ### Core
-- [ ] disable date(s) based on optional expression
+- [x] disable date(s) based on optional expression
 - [x] min date
 - [x] max date
 - [x] customize date(s) with classes and title based on optional expression
