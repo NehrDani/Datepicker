@@ -31,6 +31,7 @@
 
   function Datepicker (container) {
     var options = {};
+    var today = new Date();
 
     // dynamic and optional paramters
     if (typeof arguments[1] === "object") {
@@ -40,13 +41,13 @@
     } else if (typeof arguments[1] === "function")
       this._onChange = arguments[1];
 
-    this.date = new Date();
+    this.date = null;
 
     this._state = {
       mode: "date",
-      year: this.date.getFullYear(),
-      month: this.date.getMonth(),
-      day: this.date.getDate()
+      year: today.getFullYear(),
+      month: today.getMonth(),
+      day: today.getDate()
     };
 
     this._config = extend({
@@ -257,9 +258,9 @@
   function renderYearPicker (options, setState) {
     // bindings
     var state = options.state;
-    var active = {
+    var active = (options.active instanceof Date) ? {
       year: options.active.getFullYear()
-    };
+    } : null;
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
     var customizeDate = options.config.customizeDate;
@@ -305,8 +306,10 @@
       }
 
       // active if selected year
-      if (active.year === year) {
-        btn.className += " active";
+      if (active !== null) {
+        if (active.year === year) {
+          btn.className += " active";
+        }
       }
 
       // add customize options based on function return
@@ -351,10 +354,10 @@
   function renderMonthPicker (options, setState) {
     // bindings
     var state = options.state;
-    var active = {
+    var active = (options.active instanceof Date) ? {
       year: options.active.getFullYear(),
       month: options.active.getMonth()
-    };
+    } : null;
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
     var customizeDate = options.config.customizeDate;
@@ -393,9 +396,11 @@
       }
 
       // set month to active if selected
-      if (active.month === month &&
-      active.year === year) {
-        btn.className += " active";
+      if (active !== null) {
+        if (active.month === month &&
+        active.year === year) {
+          btn.className += " active";
+        }
       }
 
       // add customize options based on function return
@@ -441,11 +446,11 @@
   function renderDatePicker (options, setState) {
     // bindings
     var state = options.state;
-    var active = {
-      year: options.active.getFullYear(),
-      month: options.active.getMonth(),
-      day: options.active.getDate()
-    };
+    var active = (options.active instanceof Date) ? {
+      "day": options.active.getDate(),
+      "month": options.active.getMonth(),
+      "year": options.active.getFullYear()
+    } : null;
     var firstDay = options.config.firstDay;
     var minDate = options.config.minDate;
     var maxDate = options.config.maxDate;
@@ -538,10 +543,12 @@
       }
 
       // set date to active if selected day
-      if (active.day === day &&
-      active.month === month &&
-      active.year === year) {
-        btn.className += " active";
+      if (active !== null) {
+        if (active.day === day &&
+        active.month === month &&
+        active.year === year) {
+          btn.className += " active";
+        }
       }
 
       // text
