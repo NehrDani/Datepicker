@@ -5,9 +5,9 @@
 - [x] customize date(s) with classes and title based on optional expression
 
 ### Demos / Examples
-- [ ] add examples for show / hide Datepicker (popup)
-  - [ ] bind on button
-  - [ ] bind on input
+- [x] add examples for show / hide Datepicker (popup)
+  - [x] bind on button
+  - [x] bind on input
 - [ ] add customizeDate example
 - [ ] add disableDate example
 

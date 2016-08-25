@@ -27,6 +27,49 @@
           </div>
         </div>
       </div>
+
+      <div id="datepicker-input" class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Datepicker Input</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+            </div>
+            <div class="form-group">
+              <button class="btn btn-default set-date" value="today">Today</button>
+              <button class="btn btn-default set-date" value="tomorrow">Tomorrow</button>
+              <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="datepicker-popup" class="col-sm-4">
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            <h3 class="panel-title">Datepicker Popup</h3>
+          </div>
+          <div class="panel-body">
+            <div class="form-group">
+              <div class="input-group">
+                <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+                <span class="input-group-btn">
+                  <button type="button" class="btn btn-default show">
+                    <i class="glyphicon glyphicon-calendar"></i>
+                  </button>
+                </span>
+              </div>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-default set-date" value="today">Today</button>
+              <button class="btn btn-default set-date" value="tomorrow">Tomorrow</button>
+              <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 
@@ -34,19 +77,22 @@
   <script>
     document.addEventListener("DOMContentLoaded", function () {
       fixed();
+      input();
+      popup();
     });
 
+    /* Example: fixed container */
     function fixed () {
       var demo = document.querySelector("#datepicker-fixed");
       var input = demo.querySelector("input");
       var container = demo.querySelector(".calendar");
       var date = new Date();
 
-      var datepicker = new Datepicker(container, function (date) {
+      var datepicker = new Datepicker(function (date) {
         input.value = formatDate(date);
       });
 
-      // input.value = formatDate(datepicker.date);
+      container.appendChild(datepicker.element);
 
       input.addEventListener("input", function () {
         if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
@@ -56,22 +102,115 @@
 
       demo.querySelectorAll(".set-date").forEach(function (el, i) {
         el.addEventListener("click", function () {
-          switch (this.value) {
-          case "today":
-            date = new Date();
-            break;
-          case "tomorrow":
-            date = new Date(new Date().getTime() + (24 * 60 * 60 * 1000));
-            break;
-          default:
-            date = new Date(formatDate(this.value, true));
-            break;
-          }
-
-          input.value = formatDate(date);
-          datepicker.setDate(date);
+          setDate(this.value, input, datepicker);
         });
       });
+    }
+
+    /* Example: show / hide on input (focus,blur) */
+    function input () {
+      var demo = document.querySelector("#datepicker-input");
+      var input = demo.querySelector("input");
+      var container = input.parentNode;
+      var date = new Date();
+
+      var datepicker = new Datepicker(function (date) {
+        input.value = formatDate(date);
+        hide(datepicker.element);
+      });
+
+      bindTo(datepicker.element, input);
+
+      hide(datepicker.element);
+
+      input.addEventListener("focus", function () {
+        show(datepicker.element);
+      });
+
+      input.addEventListener("blur", function () {
+        hide(datepicker.element);
+      });
+
+      input.addEventListener("input", function () {
+        if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
+          datepicker.setDate(formatDate(this.value, true));
+        }
+      });
+
+      demo.querySelectorAll(".set-date").forEach(function (el, i) {
+        el.addEventListener("click", function () {
+          setDate(this.value, input, datepicker);
+        });
+      });
+    }
+
+    /* Example: show / hide on button (popup) */
+    function popup () {
+      var demo = document.querySelector("#datepicker-popup");
+      var input = demo.querySelector("input");
+      var button = demo.querySelector(".show");
+      var container = input.parentNode;
+      var date = new Date();
+
+      var datepicker = new Datepicker(container, function (date) {
+        input.value = formatDate(date);
+        hide(datepicker.element);
+      });
+
+      bindTo(datepicker.element, input);
+
+      hide(datepicker.element);
+
+      button.addEventListener("focus", function () {
+        show(datepicker.element);
+      });
+
+      button.addEventListener("blur", function () {
+        hide(datepicker.element);
+      });
+
+      input.addEventListener("input", function () {
+        if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
+          datepicker.setDate(formatDate(this.value, true));
+        }
+      });
+
+      demo.querySelectorAll(".set-date").forEach(function (el, i) {
+        el.addEventListener("click", function () {
+          setDate(this.value, input, datepicker);
+        });
+      });
+    }
+
+    /* little helper */
+    function bindTo (src, dest) {
+      var top = dest.offsetTop + dest.offsetHeight;
+      var left = dest.offsetLeft;
+
+      dest.parentNode.insertBefore(src, dest.nextSibling);
+
+      src.style.position = "absolute";
+      src.style.top = top + "px";
+      src.style.left = left + "px";
+
+      src.addEventListener("mousedown", blockElement)
+    }
+
+    function setDate (value, input, datepicker) {
+      switch (value) {
+      case "today":
+        date = new Date();
+        break;
+      case "tomorrow":
+        date = new Date(new Date().getTime() + (24 * 60 * 60 * 1000));
+        break;
+      default:
+        date = new Date(formatDate(value, true));
+        break;
+      }
+
+      input.value = formatDate(date);
+      datepicker.setDate(date);
     }
 
     function formatDate (date, reverse) {
@@ -82,6 +221,14 @@
       return date.getFullYear() + "-" +
         ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
         ("0" + date.getDate()).slice(-2);
+    }
+
+    function hide (el) {
+      el.style.display = "none";
+    }
+
+    function show (el) {
+      el.style.display = "block";
     }
 
     function blockElement (e) {

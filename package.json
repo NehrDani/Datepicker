@@ -1,6 +1,6 @@
 {
   "name": "datepicker",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "a vanilla js datepicker with no dependencies",
   "scripts": {
     "uglify": "uglifyjs --compress --mangle -o datepicker.min.js datepicker.js"

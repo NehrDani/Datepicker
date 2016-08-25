@@ -29,17 +29,17 @@
   // making global
   window.Datepicker = Datepicker;
 
-  function Datepicker (container) {
+  function Datepicker () {
     var options = {};
     var today = new Date();
 
     // dynamic and optional paramters
-    if (typeof arguments[1] === "object") {
-      options = arguments[1];
-      if (typeof arguments[2] === "function")
-        this._onChange = arguments[2];
-    } else if (typeof arguments[1] === "function")
-      this._onChange = arguments[1];
+    if (typeof arguments[0] === "object") {
+      options = arguments[0];
+      if (typeof arguments[1] === "function")
+        this._onChange = arguments[1];
+    } else if (typeof arguments[0] === "function")
+      this._onChange = arguments[0];
 
     this.date = null;
 
@@ -60,7 +60,6 @@
 
     // create datepicker node and append it to the container
     this.element = createElement("div", {class: "datepicker"});
-    container.appendChild(this.element);
 
     // initial rendering
     this._render();
