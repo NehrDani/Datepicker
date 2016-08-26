@@ -64,6 +64,7 @@
     _render: render,
     _setState: setState,
     setDate: setDate,
+    clearDate: clearDate,
     destroy: destroy
   };
 
@@ -110,13 +111,23 @@
   }
 
   function setDate (date) {
-    this.date = new Date(date);
-    this._state.day = this.date.getDate();
-    this._state.month = this.date.getMonth();
-    this._state.year = this.date.getFullYear();
+    if (date) {
+      this.date = new Date(date);
+      this._state.day = this.date.getDate();
+      this._state.month = this.date.getMonth();
+      this._state.year = this.date.getFullYear();
+    } else {
+      this.date = null;
+    }
 
     this._render();
     return this.date;
+  }
+
+  function clearDate () {
+    this.date = null;
+    this._render();
+    return;
   }
 
   function render () {
@@ -284,7 +295,7 @@
       // disable year depending on min and max dates
       if ((config.minDate && date < config.minDate) ||
       (config.maxDate && date > config.maxDate)) {
-        btn = setDisabled(btn);
+        btn = setDisabled(btn, true);
       }
 
       // active if selected year
