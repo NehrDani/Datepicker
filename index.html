@@ -88,8 +88,10 @@
       var container = demo.querySelector(".calendar");
       var date = new Date();
 
-      var datepicker = new Datepicker(function (date) {
-        input.value = formatDate(date);
+      var datepicker = new Datepicker({
+        onChange: function (date) {
+          input.value = formatDate(date);
+        }
       });
 
       container.appendChild(datepicker.element);
@@ -114,9 +116,10 @@
       var container = input.parentNode;
       var date = new Date();
 
-      var datepicker = new Datepicker(function (date) {
-        input.value = formatDate(date);
-        hide(datepicker.element);
+      var datepicker = new Datepicker({
+        onChange: function (date) {
+          input.value = formatDate(date);
+        }
       });
 
       bindTo(datepicker.element, input);
@@ -152,9 +155,10 @@
       var container = input.parentNode;
       var date = new Date();
 
-      var datepicker = new Datepicker(container, function (date) {
-        input.value = formatDate(date);
-        hide(datepicker.element);
+      var datepicker = new Datepicker({
+        onChange: function (date) {
+          input.value = formatDate(date);
+        }
       });
 
       bindTo(datepicker.element, input);

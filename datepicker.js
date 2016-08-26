@@ -29,17 +29,8 @@
   // making global
   window.Datepicker = Datepicker;
 
-  function Datepicker () {
-    var options = {};
+  function Datepicker (options) {
     var today = new Date();
-
-    // dynamic and optional paramters
-    if (typeof arguments[0] === "object") {
-      options = arguments[0];
-      if (typeof arguments[1] === "function")
-        this._onChange = arguments[1];
-    } else if (typeof arguments[0] === "function")
-      this._onChange = arguments[0];
 
     this.date = null;
 
@@ -55,8 +46,9 @@
       minDate: null,
       maxDate: null,
       customizeDate: null,
-      disableDate: null
-    }, options);
+      disableDate: null,
+      onChange: null
+    }, options || {});
 
     // create datepicker node and append it to the container
     this.element = createElement("div", {class: "datepicker"});
@@ -105,8 +97,8 @@
       this.setDate(
         new Date(this._state.year, this._state.month, this._state.day)
       );
-      if (typeof this._onChange === "function")
-        this._onChange(this.date);
+      if (typeof this._config.onChange === "function")
+        this._config.onChange(this.date);
       return;
     }
 
