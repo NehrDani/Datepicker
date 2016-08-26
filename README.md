@@ -1,14 +1,15 @@
-## Datepicker plugin in plain javascript - no dependencies
+## Javascript Datepicker | lightweight, customizable CSS, no dependencies, extendable
 
-Work in progress...
+**Work in progress...**
 
-The core functions work well.
-There is still some work to implement it though.
-But here are some examples how to implement and use it :
+There is some work needed to implement it.
+So here are some examples how to implement and use it :
 https://nehrdani.github.io/Datepicker/
 
-Feel free to try, I appreciate every feedback.
+A detailed feature list, and setup guide is coming soon.
 
-I'm not planning to add any implmenting features into the core.
+**Feel free to try, I appreciate every feedback.**
+
+*I'm not planning to add any implementing features into the core.
 I want the core slick and lightweight.
-I think the Datepicker is much more flexible and expandable without that bloat.
+I think the Datepicker is much more flexible and extendable without that bloat.*
