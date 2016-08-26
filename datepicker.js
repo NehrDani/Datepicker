@@ -20,37 +20,40 @@
   var WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   // i18n
-  var _lang = window.lang;
-  if (_lang !== undefined) {
-    MONTHS = _lang.months || MONTHS;
-    WEEKDAYS = _lang.weekdays || WEEKDAYS;
+  var lang = window.lang;
+  if (lang !== undefined) {
+    MONTHS = lang.months || MONTHS;
+    WEEKDAYS = lang.weekdays || WEEKDAYS;
   }
 
   // making global
   window.Datepicker = Datepicker;
 
   function Datepicker (options) {
-    var today = new Date();
+    var date = new Date();
 
     this.date = null;
 
     this._state = {
       mode: "date",
-      year: today.getFullYear(),
-      month: today.getMonth(),
-      day: today.getDate()
+      year: date.getFullYear(),
+      month: date.getMonth(),
+      day: date.getDate()
     };
 
     this._config = extend({
       firstDay: 0,
       minDate: null,
       maxDate: null,
-      customizeDate: null,
+      customClass: null,
       disableDate: null,
       onChange: null
     }, options || {});
 
-    // create datepicker node and append it to the container
+    if (this._config.startMode)
+      this._state.mode = this._config.startMode;
+
+    // create datepicker element and append it to the container
     this.element = createElement("div", {class: "datepicker"});
 
     // initial rendering
@@ -123,25 +126,25 @@
 
     switch (this._state.mode) {
     case "date":
-      fragment.appendChild(renderDatePicker({
-        state: this._state,
-        active: this.date,
-        config: this._config
-      }, setState));
+      fragment.appendChild(renderDatePicker(
+        this._state,
+        this.date,
+        this._config,
+        setState));
       break;
     case "month":
-      fragment.appendChild(renderMonthPicker({
-        state: this._state,
-        active: this.date,
-        config: this._config
-      }, setState));
+      fragment.appendChild(renderMonthPicker(
+        this._state,
+        this.date,
+        this._config,
+        setState));
       break;
     case "year":
-      fragment.appendChild(renderYearPicker({
-        state: this._state,
-        active: this.date,
-        config: this._config
-      }, setState));
+      fragment.appendChild(renderYearPicker(
+        this._state,
+        this.date,
+        this._config,
+        setState));
       break;
     }
 
@@ -246,16 +249,11 @@
     return head;
   }
 
-  function renderYearPicker (options, setState) {
+  function renderYearPicker (state, active, config, setState) {
     // bindings
-    var state = options.state;
-    var active = (options.active instanceof Date) ? {
-      year: options.active.getFullYear()
+    active = (active instanceof Date) ? {
+      year: active.getFullYear()
     } : null;
-    var minDate = options.config.minDate;
-    var maxDate = options.config.maxDate;
-    var customizeDate = options.config.customizeDate;
-    var disableDate = options.config.disableDate;
 
     // variables
     var row, col, btn;
@@ -284,16 +282,9 @@
       btn.innerHTML = year;
 
       // disable year depending on min and max dates
-      if ((minDate && date < minDate) ||
-      (maxDate && date > maxDate)) {
+      if ((config.minDate && date < config.minDate) ||
+      (config.maxDate && date > config.maxDate)) {
         btn = setDisabled(btn);
-      }
-
-      // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        if (disableDate({date: date, mode: "year"})) {
-          btn = setDisabled(btn);
-        }
       }
 
       // active if selected year
@@ -304,12 +295,12 @@
       }
 
       // add customize options based on function return
-      if (typeof customizeDate === "function") {
-        btn = setCustom(btn, customizeDate({date: date, mode: "date"}));
+      if (typeof config.customClass === "function") {
+        btn = setCustom(btn, config.customClass({date: date, mode: "year"}));
       }
       // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        btn = setDisabled(btn, disableDate({date: date, mode: "date"}));
+      if (typeof config.disableDate === "function") {
+        btn = setDisabled(btn, config.disableDate({date: date, mode: "year"}));
       }
 
       // add event
@@ -342,17 +333,12 @@
     return yearpicker;
   }
 
-  function renderMonthPicker (options, setState) {
+  function renderMonthPicker (state, active, config, setState) {
     // bindings
-    var state = options.state;
-    var active = (options.active instanceof Date) ? {
-      year: options.active.getFullYear(),
-      month: options.active.getMonth()
+    active = (active instanceof Date) ? {
+      year: active.getFullYear(),
+      month: active.getMonth()
     } : null;
-    var minDate = options.config.minDate;
-    var maxDate = options.config.maxDate;
-    var customizeDate = options.config.customizeDate;
-    var disableDate = options.config.disableDate;
 
     // variables
     var row, col, btn;
@@ -381,8 +367,8 @@
       btn.innerHTML = MONTHS[month];
 
       // disable month depending on min and max dates
-      if ((minDate && date < minDate) ||
-      (maxDate && date > maxDate)) {
+      if ((config.minDate && date < config.minDate) ||
+      (config.maxDate && date > config.maxDate)) {
         btn = setDisabled(btn, true);
       }
 
@@ -395,12 +381,12 @@
       }
 
       // add customize options based on function return
-      if (typeof customizeDate === "function") {
-        btn = setCustom(btn, customizeDate({date: date, mode: "month"}));
+      if (typeof config.customClass === "function") {
+        btn = setCustom(btn, config.customClass({date: date, mode: "month"}));
       }
       // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        btn = setDisabled(btn, disableDate({date: date, mode: "month"}));
+      if (typeof config.disableDate === "function") {
+        btn = setDisabled(btn, config.disableDate({date: date, mode: "month"}));
       }
 
       // bind event
@@ -434,25 +420,20 @@
     return monthpicker;
   }
 
-  function renderDatePicker (options, setState) {
+  function renderDatePicker (state, active, config, setState) {
     // bindings
-    var state = options.state;
-    var active = (options.active instanceof Date) ? {
-      "day": options.active.getDate(),
-      "month": options.active.getMonth(),
-      "year": options.active.getFullYear()
+    active = (active instanceof Date) ? {
+      "day": active.getDate(),
+      "month": active.getMonth(),
+      "year": active.getFullYear()
     } : null;
-    var firstDay = options.config.firstDay;
-    var minDate = options.config.minDate;
-    var maxDate = options.config.maxDate;
-    var customizeDate = options.config.customizeDate;
-    var disableDate = options.config.disableDate;
 
     // variables
     var row, col, btn, weekday, week;
     var day = 0, month = 0, year = 0, date;
     var daysInMonth = getDaysInMonth(state.year, state.month);
-    var before = new Date(state.year, state.month, 1).getDay() - firstDay;
+    var before = new Date(state.year, state.month, 1).getDay();
+    before -= config.firstDay;
     var start = 0;
 
     /*
@@ -482,7 +463,7 @@
     head.firstChild.appendChild(createElement("th"));
     for (var w = 0; w < 7; w++) {
       weekday = createElement("th");
-      weekday.innerHTML = getWeekday(w, firstDay);
+      weekday.innerHTML = getWeekday(w, config.firstDay);
       head.firstChild.appendChild(weekday);
     }
     // </th>
@@ -528,8 +509,8 @@
       }
 
       // disable dates depending on min and max dates
-      if ((minDate && date < minDate) ||
-      (maxDate && date > maxDate)) {
+      if ((config.minDate && date < config.minDate) ||
+      (config.maxDate && date > config.maxDate)) {
         btn = setDisabled(btn, true);
       }
 
@@ -548,12 +529,12 @@
       btn.value = year + "-" + month + "-" + day;
 
       // add customize options based on function return
-      if (typeof customizeDate === "function") {
-        btn = setCustom(btn, customizeDate({date: date, mode: "date"}));
+      if (typeof config.customClass === "function") {
+        btn = setCustom(btn, config.customClass({date: date, mode: "date"}));
       }
       // disabled dates based on function return
-      if (typeof disableDate === "function") {
-        btn = setDisabled(btn, disableDate({date: date, mode: "date"}));
+      if (typeof config.disableDate === "function") {
+        btn = setDisabled(btn, config.disableDate({date: date, mode: "date"}));
       }
 
       // add event
@@ -654,13 +635,9 @@
     return Math.floor(Math.round((time - checkDate) / 864e5) / 7) + 1;
   }
 
-  function setCustom (btn, options) {
-    if (options) {
-      if (options.class)
-        btn.className += " " + options.class;
-      if (options.title)
-        btn.setAttribute("title", options.title);
-    }
+  function setCustom (btn, className) {
+    if (className)
+      btn.className += " " + className;
     return btn;
   }
 

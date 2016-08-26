@@ -2,7 +2,7 @@
 - [x] disable date(s) based on optional expression
 - [x] min date
 - [x] max date
-- [x] customize date(s) with classes and title based on optional expression
+- [x] customize date(s) with classes based on optional expression
 - [ ] simplify invokation and configuration
 
 ### Demos / Examples
