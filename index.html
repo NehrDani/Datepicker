@@ -2,205 +2,190 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Datepicker</title>
+  <title>Datepicker examples</title>
   <link rel="stylesheet" href="datepicker.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <script src="datepicker.js"></script>
+
+  <style>
+    .today {
+      position: relative;
+    }
+    .today:before {
+      content: " ";
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 0;
+      height: 0;
+      border-top: 0.5em solid #0059bc;
+      border-left: .5em solid transparent;
+    }
+    .tomorrow {
+      position: relative;
+    }
+    .tomorrow:before {
+      content: " ";
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      width: 0;
+      height: 0;
+      border-top: 0.5em solid #59bc00;
+      border-left: .5em solid transparent;
+    }
+  </style>
 </head>
 <body>
   <main class=container>
-    <div class="row">
-      <div id="datepicker-fixed" class="col-sm-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Datepicker Fixed</h3>
-          </div>
-          <div class="panel-body">
-            <div class="form-group">
-              <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
-            </div>
-            <div class="calendar form-group"></div>
-            <div class="form-group">
-              <button class="btn btn-default set-date" value="today">Today</button>
-              <button class="btn btn-default set-date" value="tomorrow">Tomorrow</button>
-              <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="datepicker-input" class="col-sm-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Datepicker Input</h3>
-          </div>
-          <div class="panel-body">
-            <div class="form-group">
-              <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
-            </div>
-            <div class="form-group">
-              <button class="btn btn-default set-date" value="today">Today</button>
-              <button class="btn btn-default set-date" value="tomorrow">Tomorrow</button>
-              <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="datepicker-popup" class="col-sm-4">
-        <div class="panel panel-default">
-          <div class="panel-heading">
-            <h3 class="panel-title">Datepicker Popup</h3>
-          </div>
-          <div class="panel-body">
-            <div class="form-group">
-              <div class="input-group">
-                <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
-                <span class="input-group-btn">
-                  <button type="button" class="btn btn-default show">
-                    <i class="glyphicon glyphicon-calendar"></i>
-                  </button>
-                </span>
-              </div>
-            </div>
-            <div class="form-group">
-              <button class="btn btn-default set-date" value="today">Today</button>
-              <button class="btn btn-default set-date" value="tomorrow">Tomorrow</button>
-              <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div class="jumbotron">
+      <h1>Datepicker</h1>
+      <p>
+        Javascript Datepicker | lightweight, customizable CSS, no dependencies, extendable
+      </p>
+      <a href="https://github.com/NehrDani/Datepicker">Datepicker source on GitHub</a>
     </div>
+
+
+    <div class="row">
+      <!-- example container -->
+      <section id="datepicker-container" class="col-sm-4">
+        <header class="page-header">
+          <h2>Container</h2>
+        </header>
+
+        <div class="form-group">
+          <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+        </div>
+
+        <div class="datepicker-container form-group"></div>
+
+        <div class="form-group">
+          <button class="btn btn-default set-date today" value="today">Today</button>
+          <button class="btn btn-default set-date tomorrow" value="tomorrow">Tomorrow</button>
+          <button class="btn btn-default set-date" value="2012-07-10">2012-07-10</button>
+          <button class="btn btn-default set-date" value="clear">Clear</button>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var demo = document.querySelector("#datepicker-container");
+            var input = demo.querySelector("input");
+            var container = demo.querySelector(".datepicker-container");
+            var date = new Date();
+
+            var datepicker = new Datepicker({
+              firstDay: 1,
+              customClass: customClass,
+              onChange: function (date) {
+                input.value = formatDate(date);
+              }
+            });
+
+            container.appendChild(datepicker.element);
+
+            input.addEventListener("input", function () {
+              datepicker.setDate(formatDate(this.value, true));
+            });
+
+            demo.querySelectorAll(".set-date").forEach(function (el, i) {
+              el.addEventListener("click", function () {
+                setDate(this.value, input, datepicker);
+              });
+            });
+          });
+        </script>
+      </section>
+
+      <!-- example on button -->
+      <section id="datepicker-popup" class="col-sm-4">
+        <header class="page-header">
+          <h2>Popup</h2>
+        </header>
+
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default show">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var demo = document.querySelector("#datepicker-popup");
+            var input = demo.querySelector("input");
+            var button = demo.querySelector(".show");
+            var container = input.parentNode;
+            var date = new Date();
+
+            var datepicker = new Datepicker({
+              onChange: function (date) {
+                input.value = formatDate(date);
+                hide(datepicker.element);
+              }
+            });
+
+            bindTo(datepicker.element, input);
+
+            hide(datepicker.element);
+
+            input.addEventListener("input", function () {
+              datepicker.setDate(formatDate(this.value, true));
+            });
+
+            input.addEventListener("focus", function () {
+              show(datepicker.element);
+            });
+
+            input.addEventListener("blur", function () {
+              hide(datepicker.element);
+            });
+
+            button.addEventListener("focus", function () {
+              show(datepicker.element);
+            });
+
+            button.addEventListener("blur", function () {
+              hide(datepicker.element);
+            });
+          });
+        </script>
+      </section>
+    </div>
+
+    <footer class="text-muted">
+      Copyright © 2016 Daniel Nehring | MIT license
+    </footer>
   </main>
 
-  <script src="datepicker.js"></script>
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      fixed();
-      input();
-      popup();
-    });
-
-    /* Example: fixed container */
-    function fixed () {
-      var demo = document.querySelector("#datepicker-fixed");
-      var input = demo.querySelector("input");
-      var container = demo.querySelector(".calendar");
-      var date = new Date();
-
-      var datepicker = new Datepicker({
-        onChange: function (date) {
-          input.value = formatDate(date);
-        }
-      });
-
-      container.appendChild(datepicker.element);
-
-      input.addEventListener("input", function () {
-        if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
-          datepicker.setDate(formatDate(this.value, true));
-        }
-      });
-
-      demo.querySelectorAll(".set-date").forEach(function (el, i) {
-        el.addEventListener("click", function () {
-          setDate(this.value, input, datepicker);
-        });
-      });
-    }
-
-    /* Example: show / hide on input (focus,blur) */
-    function input () {
-      var demo = document.querySelector("#datepicker-input");
-      var input = demo.querySelector("input");
-      var container = input.parentNode;
-      var date = new Date();
-
-      var datepicker = new Datepicker({
-        onChange: function (date) {
-          input.value = formatDate(date);
-        }
-      });
-
-      bindTo(datepicker.element, input);
-
-      hide(datepicker.element);
-
-      input.addEventListener("focus", function () {
-        show(datepicker.element);
-      });
-
-      input.addEventListener("blur", function () {
-        hide(datepicker.element);
-      });
-
-      input.addEventListener("input", function () {
-        if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
-          datepicker.setDate(formatDate(this.value, true));
-        }
-      });
-
-      demo.querySelectorAll(".set-date").forEach(function (el, i) {
-        el.addEventListener("click", function () {
-          setDate(this.value, input, datepicker);
-        });
-      });
-    }
-
-    /* Example: show / hide on button (popup) */
-    function popup () {
-      var demo = document.querySelector("#datepicker-popup");
-      var input = demo.querySelector("input");
-      var button = demo.querySelector(".show");
-      var container = input.parentNode;
-      var date = new Date();
-
-      var datepicker = new Datepicker({
-        onChange: function (date) {
-          input.value = formatDate(date);
-        }
-      });
-
-      bindTo(datepicker.element, input);
-
-      hide(datepicker.element);
-
-      button.addEventListener("focus", function () {
-        show(datepicker.element);
-      });
-
-      button.addEventListener("blur", function () {
-        hide(datepicker.element);
-      });
-
-      input.addEventListener("input", function () {
-        if (/^\d{4}\-\d{2}\-\d{2}$/.test(this.value)) {
-          datepicker.setDate(formatDate(this.value, true));
-        }
-      });
-
-      demo.querySelectorAll(".set-date").forEach(function (el, i) {
-        el.addEventListener("click", function () {
-          setDate(this.value, input, datepicker);
-        });
-      });
-    }
-
     /* little helper */
-    function bindTo (src, dest) {
-      var top = dest.offsetTop + dest.offsetHeight;
-      var left = dest.offsetLeft;
+    function customClass (state) {
+      var today = new Date().setHours(0, 0, 0, 0);
+      var tomorrow = new Date(today).setDate(new Date().getDate() + 1);
 
-      dest.parentNode.insertBefore(src, dest.nextSibling);
+      if (state.mode === "date" && state.date.getTime() === today) {
+        return "today";
+      }
 
-      src.style.position = "absolute";
-      src.style.top = top + "px";
-      src.style.left = left + "px";
+      if (state.mode === "date" && state.date.getTime() == tomorrow) {
+        return "tomorrow";
+      }
 
-      src.addEventListener("mousedown", blockElement)
+      return false;
     }
 
     function setDate (value, input, datepicker) {
+      if (value === "clear") {
+        input.value = null;
+        datepicker.clearDate();
+        return;
+      }
+
       switch (value) {
       case "today":
         date = new Date();
@@ -218,13 +203,15 @@
     }
 
     function formatDate (date, reverse) {
-      if (reverse) {
+      if (reverse && /^\d{4}\-\d{2}\-\d{2}$/.test(date)) {
         date = date.split("-");
         return new Date(+date[0], +date[1] - 1, +date[2])
+      } else if (date instanceof Date) {
+        return date.getFullYear() + "-" +
+          ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+          ("0" + date.getDate()).slice(-2);
       }
-      return date.getFullYear() + "-" +
-        ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
-        ("0" + date.getDate()).slice(-2);
+      return false;
     }
 
     function hide (el) {
@@ -232,6 +219,20 @@
     }
 
     function show (el) {
+      var top = el.parentNode.offsetHeight;
+      var left = el.parentNode.offsetLeft;
+      var pos = window.innerHeight / 2;
+      var rect = el.parentNode.getBoundingClientRect();
+
+      if (pos < rect.top) {
+        el.style.bottom = top + "px";
+        el.style.top = null;
+      } else {
+        el.style.bottom = null;
+        el.style.top = top + "px";
+      }
+
+      el.style.left = 0;
       el.style.display = "block";
     }
 
@@ -241,12 +242,11 @@
       return false;
     }
 
-    function destroy (datepicker) {
-      if (datepicker) {
-        datepicker.container.removeEventListener("mouseup", blockElement);
-        datepicker.container.removeEventListener("mousedown", blockElement);
-        datepicker.destroy();
-      }
+    function bindTo (src, dest) {
+      dest.parentNode.insertBefore(src, dest.nextSibling);
+      dest.parentNode.style.position = "relative";
+      src.style.position = "absolute";
+      src.addEventListener("mousedown", blockElement)
     }
   </script>
 </body>
