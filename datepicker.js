@@ -29,8 +29,17 @@
   // making global
   window.Datepicker = Datepicker;
 
-  function Datepicker (options) {
+  function Datepicker () {
     var date = new Date();
+
+    var defaults = {
+      firstDay: 0,
+      minDate: null,
+      maxDate: null,
+      customClass: null,
+      disableDate: null,
+      onChange: null
+    };
 
     this.date = null;
 
@@ -41,14 +50,7 @@
       day: date.getDate()
     };
 
-    this._config = extend({
-      firstDay: 0,
-      minDate: null,
-      maxDate: null,
-      customClass: null,
-      disableDate: null,
-      onChange: null
-    }, options || {});
+    this._config = extend(defaults, arguments[0] || {});
 
     if (this._config.startMode)
       this._state.mode = this._config.startMode;
@@ -131,31 +133,18 @@
   }
 
   function render () {
-    var setState = this._setState.bind(this);
     var fragment = document.createDocumentFragment();
-    fragment.appendChild(renderHead(this._state, setState));
+    fragment.appendChild(renderHead.call(this));
 
     switch (this._state.mode) {
     case "date":
-      fragment.appendChild(renderDatePicker(
-        this._state,
-        this.date,
-        this._config,
-        setState));
+      fragment.appendChild(renderDatePicker.call(this));
       break;
     case "month":
-      fragment.appendChild(renderMonthPicker(
-        this._state,
-        this.date,
-        this._config,
-        setState));
+      fragment.appendChild(renderMonthPicker.call(this));
       break;
     case "year":
-      fragment.appendChild(renderYearPicker(
-        this._state,
-        this.date,
-        this._config,
-        setState));
+      fragment.appendChild(renderYearPicker.call(this));
       break;
     }
 
@@ -164,7 +153,9 @@
     return true;
   }
 
-  function renderHead (state, setState) {
+  function renderHead () {
+    var setState = this._setState.bind(this);
+    var state = this._state;
     var prev, change, next, newState;
 
     // <div class="pick-head">
@@ -260,11 +251,14 @@
     return head;
   }
 
-  function renderYearPicker (state, active, config, setState) {
+  function renderYearPicker () {
     // bindings
-    active = (active instanceof Date) ? {
-      year: active.getFullYear()
+    var config = this._config;
+    var state = this._state;
+    var active = (this.date instanceof Date) ? {
+      year: this.date.getFullYear()
     } : null;
+    var setState = this._setState.bind(this);
 
     // variables
     var row, col, btn;
@@ -344,11 +338,14 @@
     return yearpicker;
   }
 
-  function renderMonthPicker (state, active, config, setState) {
+  function renderMonthPicker () {
     // bindings
-    active = (active instanceof Date) ? {
-      year: active.getFullYear(),
-      month: active.getMonth()
+    var setState = this._setState.bind(this);
+    var state = this._state;
+    var config = this._config;
+    var active = (this.date instanceof Date) ? {
+      year: this.date.getFullYear(),
+      month: this.date.getMonth()
     } : null;
 
     // variables
@@ -431,12 +428,15 @@
     return monthpicker;
   }
 
-  function renderDatePicker (state, active, config, setState) {
+  function renderDatePicker () {
     // bindings
-    active = (active instanceof Date) ? {
-      "day": active.getDate(),
-      "month": active.getMonth(),
-      "year": active.getFullYear()
+    var setState = this._setState.bind(this);
+    var state = this._state;
+    var config = this._config;
+    var active = (this.date instanceof Date) ? {
+      "day": this.date.getDate(),
+      "month": this.date.getMonth(),
+      "year": this.date.getFullYear()
     } : null;
 
     // variables
@@ -603,19 +603,19 @@
     return node;
   }
 
-  function extend (out) {
-    out = out || {};
+  function extend (properties) {
+    properties = properties || {};
 
     for (var i = 1; i < arguments.length; i++) {
       if (!arguments[i]) continue;
 
       for (var key in arguments[i]) {
         if (arguments[i].hasOwnProperty(key))
-          out[key] = arguments[i][key];
+          properties[key] = arguments[i][key];
       }
     }
 
-    return out;
+    return properties;
   }
 
   function getDaysInMonth (year, month) {
