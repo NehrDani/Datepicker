@@ -29,6 +29,7 @@
   // making global
   window.Datepicker = Datepicker;
 
+  /* the Datepicker constructor */
   function Datepicker () {
     var date = new Date();
 
@@ -38,7 +39,7 @@
       maxDate: null,
       customClass: null,
       disableDate: null,
-      onChange: null
+      onSelect: null
     };
 
     this.date = null;
@@ -69,6 +70,8 @@
     clearDate: clearDate,
     destroy: destroy
   };
+
+  /* public and protected methods */
 
   function setState (state, save) {
     var option, value;
@@ -103,8 +106,8 @@
       this.setDate(
         new Date(this._state.year, this._state.month, this._state.day)
       );
-      if (typeof this._config.onChange === "function")
-        this._config.onChange(this.date);
+      if (typeof this._config.onSelect === "function")
+        this._config.onSelect(this.date);
       return;
     }
 
@@ -148,11 +151,23 @@
       break;
     }
 
-    this.element.innerHTML = "";
+    this.element.innerHTML = null;
     this.element.appendChild(fragment);
-    return true;
+    fragment = null;
+    return this.element;
   }
 
+  function destroy () {
+    if (this.element.parentNode)
+      this.element.parentNode.removeChild(this.element);
+
+    this.element.innerHTML = null;
+    this.element = null;
+    return null;
+  }
+
+  /* private methods */
+  
   function renderHead () {
     var setState = this._setState.bind(this);
     var state = this._state;
@@ -581,6 +596,7 @@
   }
 
   /* helper functions */
+
   function createElement (element, options) {
     var node = document.createElement(element);
 
@@ -658,11 +674,5 @@
       btn.setAttribute("disabled", true);
     }
     return btn;
-  }
-
-  function destroy () {
-    this.container.innerHTML = "";
-    this.container.parentNode.removeChild(this.container);
-    return;
   }
 })(window, document);
