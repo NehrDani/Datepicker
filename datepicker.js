@@ -1,3 +1,9 @@
+/*!
+ * Datepicker
+ *
+ * Copyright © 2016 Daniel Nehring | MIT license | https://github.com/NehrDani/Datepicker
+ */
+
 (function (window, document, undefined) {
 
   /* constants */
@@ -56,7 +62,6 @@
     if (this._config.startMode)
       this._state.mode = this._config.startMode;
 
-    // create datepicker element and append it to the container
     this.element = createElement("div", {class: "datepicker"});
 
     // initial rendering
@@ -73,6 +78,16 @@
 
   /* public and protected methods */
 
+  /**
+   * setState
+   *
+   * updates the state based on the passed state object and its properties and
+   * if the save flag is set it calls the setDate method to update the date
+   * calls the render method to update the view and represent the new state
+   *
+   * @param {object} state - object with the new state properties
+   * @param {bool} save - flag for updating the date
+   */
   function setState (state, save) {
     var option, value;
 
@@ -115,6 +130,14 @@
     return;
   }
 
+  /**
+   * setDate
+   *
+   * updates the date and sets the new state then renders the new state
+   *
+   * @param {Date} date - a Date object or parsable string
+   * @return {Date} - returns a Date object or null
+   */
   function setDate (date) {
     if (date) {
       this.date = new Date(date);
@@ -129,12 +152,25 @@
     return this.date;
   }
 
+  /**
+   * clearDate
+   *
+   * clears the date and calls the render method
+   */
   function clearDate () {
     this.date = null;
     this._render();
     return;
   }
 
+  /**
+   * render
+   *
+   * renders the state by calling seperate rendering methods and creating the
+   * DOM element
+   *
+   * @return - returns a DOM element
+   */
   function render () {
     var fragment = document.createDocumentFragment();
     fragment.appendChild(renderHead.call(this));
@@ -157,6 +193,14 @@
     return this.element;
   }
 
+  /**
+   * destroy
+   *
+   * removes the Datepicker element from the DOM if appended to it
+   * clears the innerHTML and the element property
+   *
+   * @return {null} - returns null
+   */
   function destroy () {
     if (this.element.parentNode)
       this.element.parentNode.removeChild(this.element);
@@ -167,7 +211,7 @@
   }
 
   /* private methods */
-  
+
   function renderHead () {
     var setState = this._setState.bind(this);
     var state = this._state;
@@ -476,8 +520,7 @@
       start -= 7;
     }
 
-    /* weekdays row */
-
+    /* weekdays */
     // <table>
     var datepicker = createElement("table");
     // <thead>
@@ -488,11 +531,16 @@
     // <th>
     head.firstChild.appendChild(createElement("th"));
     for (var w = 0; w < 7; w++) {
+
+      // adds an empty field for the weeknumbers coloumn
       weekday = createElement("th");
+
       weekday.innerHTML = getWeekday(w, config.firstDay);
       head.firstChild.appendChild(weekday);
     }
     // </th>
+    /* !weekdays */
+
     datepicker.appendChild(head);
     // </tr>
     // </thead>
@@ -510,7 +558,7 @@
       month = date.getMonth();
       year = date.getFullYear();
 
-      // show week number
+      /* week numbers */
       if (c === 0) {
         //<th>
         col = createElement("th");
@@ -519,6 +567,7 @@
         row.appendChild(col);
         // </th>
       }
+      /* !week numbers */
 
       // <td>
       col = createElement("td");
@@ -529,7 +578,7 @@
         class: "pick-btn pick-day"
       });
 
-      // mark dates outside selected month
+      // mark dates outside current month
       if (i < before || i >= (daysInMonth + before)) {
         btn.className += " out";
       }
@@ -654,11 +703,16 @@
   function getWeekNumber (date) {
     var checkDate = new Date(date);
     // set to Thursday
+    // every new week has the next thursday in it
     checkDate.setDate(checkDate.getDate() + 4 - (checkDate.getDay() || 7));
     var time = checkDate.getTime();
-    // compare with Jan 1
+    // set to Jan 1
     checkDate.setMonth(0);
     checkDate.setDate(1);
+    // calculates the milliseconds since the Jan 1
+    // divides it by the milliseconds per day (86400000)
+    // to get the current day of the year
+    // divides it by days a week (7) to get the current week of the year
     return Math.floor(Math.round((time - checkDate) / 864e5) / 7) + 1;
   }
 
