@@ -61,6 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
 * customClass ({date: date, mode: mode}) - Optional function to add classes to dates based on passing an object with date and current mode properties.
 * disableDate ({date: date, mode: mode}) - Optional function to disabled Dates based on passing an object with date and current mode properties.
 
+### i18n
+* The Datepicker has i18n support through dedicated script files.
+* Simply add a script from the i18n directory before the datepicker script and it automatically uses this language.
+
+### NPM
+* npm run uglify - minifies the datepicker.js file for production use.
+
 ### About
 *There are many other Datepicker plugins out there. But I wanted to build one on my own.*
 
