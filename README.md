@@ -5,7 +5,8 @@
 
 ### Getting Started
 
-This is the minimum markup and it renders the Datepicker as a static element on the page. If you want it dynamically hidden or shown on an event you have to to this on yourself.
+This is the minimum markup and it renders the Datepicker as a static element on the page. If you want it dynamically hidden or shown on an event you have to do this on yourself.
+
 I'm sure you can do it :wink:.
 
 #### HTML
@@ -62,4 +63,5 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ### About
 *There are many other Datepicker plugins out there. But I wanted to build one on my own.*
+
 **Feel free to try, fork and share. I appreciate every feedback.**
