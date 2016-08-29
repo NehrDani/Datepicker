@@ -40,6 +40,7 @@
     var date = new Date();
 
     var defaults = {
+      container: null,
       firstDay: 0,
       minDate: null,
       maxDate: null,
@@ -62,6 +63,10 @@
     this._state.mode = this._config.startMode;
 
     this.element = createElement("div", {class: "datepicker"});
+
+    // append to container if assigned
+    if (this._config.container)
+      this._config.container.appendChild(this.element);
 
     // initial rendering
     this._render();
