@@ -45,22 +45,21 @@
       maxDate: null,
       customClass: null,
       disableDate: null,
-      onSelect: null
+      onSelect: null,
+      startMode: "date"
     };
 
     this.date = null;
 
     this._state = {
-      mode: "date",
+      mode: null,
       year: date.getFullYear(),
       month: date.getMonth(),
       day: date.getDate()
     };
 
     this._config = extend(defaults, arguments[0] || {});
-
-    if (this._config.startMode)
-      this._state.mode = this._config.startMode;
+    this._state.mode = this._config.startMode;
 
     this.element = createElement("div", {class: "datepicker"});
 
