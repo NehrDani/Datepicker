@@ -46,7 +46,7 @@
       customClass: null,
       disableDate: null,
       onSelect: null,
-      startMode: "date"
+      startMode: "day"
     };
 
     this.date = null;
@@ -175,7 +175,7 @@
     fragment.appendChild(renderHead.call(this));
 
     switch (this._state.mode) {
-    case "date":
+    case "day":
       fragment.appendChild(renderDatePicker.call(this));
       break;
     case "month":
@@ -272,7 +272,7 @@
 
     // text / value for buttons
     switch (state.mode) {
-    case "date":
+    case "day":
       prev.name = "month";
       prev.value = state.month - 1;
 
@@ -459,7 +459,7 @@
       btn.addEventListener("click", function (e) {
         e.preventDefault();
         setState({
-          mode: "date",
+          mode: "day",
           month: this.value
         });
       });

@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", function () {
 * firstDay *(Default: 0)* - Starting day of the week from 0-6 (0 = Sunday, 6 = Saturday).
 * minDate *(Default: null)* - Defines the minimum available Date.
 * maxDate *(Default: null)* - Defines the maximum available Date.
-* startMode *["date", "month", "year"] (Default: "date")* - Defines the starting mode of the Datepicker.
+* startMode *(Default: day)* - Current mode of the Datepicker *(day|month|year)*. Defines the mode initialized.
 * customClass ({date: date, mode: mode}) - Optional function to add classes to dates based on passing an object with date and current mode properties.
 * disableDate ({date: date, mode: mode}) - Optional function to disabled Dates based on passing an object with date and current mode properties.
 
