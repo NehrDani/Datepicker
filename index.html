@@ -3,38 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Datepicker examples</title>
-  <link rel="stylesheet" href="datepicker.css">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="datepicker.css">
   <script src="datepicker.js"></script>
-
-  <style>
-    .today {
-      position: relative;
-    }
-    .today:before {
-      content: " ";
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 0;
-      height: 0;
-      border-top: 0.5em solid #0059bc;
-      border-left: .5em solid transparent;
-    }
-    .tomorrow {
-      position: relative;
-    }
-    .tomorrow:before {
-      content: " ";
-      position: absolute;
-      top: 2px;
-      right: 2px;
-      width: 0;
-      height: 0;
-      border-top: 0.5em solid #59bc00;
-      border-left: .5em solid transparent;
-    }
-  </style>
 </head>
 <body>
   <main class=container>
@@ -48,17 +19,46 @@
 
 
     <div class="row">
-      <!-- example container -->
-      <section id="datepicker-container" class="col-sm-4">
+      <!-- example static -->
+      <section id="datepicker-static" class="col-sm-4">
+        <style>
+          .today {
+            position: relative;
+          }
+          .today:before {
+            content: " ";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 0;
+            height: 0;
+            border-top: 0.5em solid #0059bc;
+            border-left: .5em solid transparent;
+          }
+          .tomorrow {
+            position: relative;
+          }
+          .tomorrow:before {
+            content: " ";
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 0;
+            height: 0;
+            border-top: 0.5em solid #59bc00;
+            border-left: .5em solid transparent;
+          }
+        </style>
+
         <header class="page-header">
-          <h2>Container</h2>
+          <h2>Static</h2>
         </header>
 
         <div class="form-group">
           <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
         </div>
 
-        <div class="datepicker-container form-group"></div>
+        <div class="container-static form-group"></div>
 
         <div class="form-group">
           <button class="btn btn-default set-date today" value="today">Today</button>
@@ -69,20 +69,19 @@
 
         <script>
           document.addEventListener("DOMContentLoaded", function () {
-            var demo = document.querySelector("#datepicker-container");
+            var demo = document.querySelector("#datepicker-static");
             var input = demo.querySelector("input");
-            var container = demo.querySelector(".datepicker-container");
+            var container = demo.querySelector(".container-static");
             var date = new Date();
 
             var datepicker = new Datepicker({
               firstDay: 1,
+              container: container,
               customClass: customClass,
               onSelect: function (date) {
                 input.value = formatDate(date);
               }
             });
-
-            container.appendChild(datepicker.element);
 
             input.addEventListener("input", function () {
               datepicker.setDate(formatDate(this.value, true));
@@ -97,8 +96,17 @@
         </script>
       </section>
 
-      <!-- example on button -->
+      <!-- example popup -->
       <section id="datepicker-popup" class="col-sm-4">
+        <style>
+          .container-popup {
+            position: absolute;
+            width: 280px;
+            border: 1px solid #ccc;
+            box-shadow:0 1px 2px 1px #ccc;
+          }
+        </style>
+
         <header class="page-header">
           <h2>Popup</h2>
         </header>
@@ -106,6 +114,7 @@
         <div class="form-group">
           <div class="input-group">
             <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+            <div class="container-popup"></div>
             <span class="input-group-btn">
               <button type="button" class="btn btn-default show">
                 <i class="glyphicon glyphicon-calendar"></i>
@@ -119,38 +128,119 @@
             var demo = document.querySelector("#datepicker-popup");
             var input = demo.querySelector("input");
             var button = demo.querySelector(".show");
-            var container = input.parentNode;
+            var container = demo.querySelector(".container-popup");
             var date = new Date();
 
             var datepicker = new Datepicker({
+              container: container,
               onSelect: function (date) {
                 input.value = formatDate(date);
-                hide(datepicker.element);
+                hide(container);
+                button.blur();
+                input.blur();
               }
             });
 
-            bindTo(datepicker.element, input);
+            container.parentNode.style.position = "relative";
+            container.addEventListener("mousedown", blockElement);
 
-            hide(datepicker.element);
+            hide(container);
 
             input.addEventListener("input", function () {
               datepicker.setDate(formatDate(this.value, true));
             });
 
             input.addEventListener("focus", function () {
-              show(datepicker.element);
+              show(container);
             });
 
             input.addEventListener("blur", function () {
-              hide(datepicker.element);
+              hide(container);
             });
 
             button.addEventListener("focus", function () {
-              show(datepicker.element);
+              show(container);
             });
 
             button.addEventListener("blur", function () {
-              hide(datepicker.element);
+              hide(container);
+            });
+          });
+        </script>
+      </section>
+
+      <!-- example popup -->
+      <section id="datepicker-dialog" class="col-sm-4">
+        <style>
+          .container-dialog {
+            position: fixed;
+            z-index: 1000;
+            top: 50%;
+            left: 50%;
+            width: 600px;
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ccc;
+            box-shadow:0 1px 2px 1px #ccc;
+            transform: translate(-50%, -50%);
+          }
+          .container-dialog .close {
+            position: absolute;
+            z-index: 1010;
+            top: 0;
+            right: 3px;;
+            padding:4px;
+          }
+        </style>
+
+        <header class="page-header">
+          <h2>Dialog</h2>
+        </header>
+
+        <div class="form-group">
+          <div class="input-group">
+            <input type="text" class="form-control" name="date" placeholder="YYYY-MM-DD">
+            <span class="input-group-btn">
+              <button type="button" class="btn btn-default show">
+                <i class="glyphicon glyphicon-calendar"></i>
+              </button>
+            </span>
+          </div>
+          <div class="container-dialog form-group">
+            <span class="close">&times;</span>
+          </div>
+        </div>
+
+        <script>
+          document.addEventListener("DOMContentLoaded", function () {
+            var demo = document.querySelector("#datepicker-dialog");
+            var input = demo.querySelector("input");
+            var button = demo.querySelector(".show");
+            var container = demo.querySelector(".container-dialog");
+            var close = container.querySelector(".close");
+            var date = new Date();
+
+            var datepicker = new Datepicker({
+              container: container,
+              onSelect: function (date) {
+                input.value = formatDate(date);
+                container.style.display = "none";
+              }
+            });
+
+            document.body.appendChild(container);
+            container.style.display = "none";
+
+            input.addEventListener("input", function () {
+              datepicker.setDate(formatDate(this.value, true));
+            });
+
+            button.addEventListener("click", function () {
+              container.style.display = "block";
+            });
+
+            close.addEventListener("click", function () {
+              container.style.display = "none";
             });
           });
         </script>
@@ -219,8 +309,8 @@
     }
 
     function show (el) {
+      console.log(el.parentNode.offsetHeight);
       var top = el.parentNode.offsetHeight;
-      var left = el.parentNode.offsetLeft;
       var pos = window.innerHeight / 2;
       var rect = el.parentNode.getBoundingClientRect();
 
@@ -240,13 +330,6 @@
       e.preventDefault();
       e.stopPropagation();
       return false;
-    }
-
-    function bindTo (src, dest) {
-      dest.parentNode.insertBefore(src, dest.nextSibling);
-      dest.parentNode.style.position = "relative";
-      src.style.position = "absolute";
-      src.addEventListener("mousedown", blockElement)
     }
   </script>
 </body>
