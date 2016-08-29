@@ -26,18 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // constructor
   var datepicker = new Datepicker({
+    container: document.querySelector("#container"), // container
     onSelect: onSelect // callback
   });
 
-  var input = document.querySelector("#input");
-  var container = document.querySelector("#container");
-
-  // manually bind the datepicker element to the container
-  container.appendChild(datepicker.element);
-
   // get a Date object as parameter to work with
   function onSelect (date) {
-    input.value = date.toDateString();
+    document.querySelector("#input").value = date.toDateString();
   }
 }
 ```
@@ -54,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ### Options
 
+* container - The container where the Datepicker will be rendered into.
 * onSelect (date) - Callback that returns the selected Date.
 * firstDay *(Default: 0)* - Starting day of the week from 0-6 (0 = Sunday, 6 = Saturday).
 * minDate *(Default: null)* - Defines the minimum available Date.
@@ -67,6 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
 * Simply add a script from the i18n directory before the datepicker script and it automatically uses this language.
 
 ### NPM
+* npm install - installs all needed dependencies
 * npm run uglify - minifies the datepicker.js file for production use.
 
 ### About
