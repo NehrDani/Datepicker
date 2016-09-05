@@ -37,17 +37,14 @@ document.addEventListener("DOMContentLoaded", function () {
 ```
 
 ### Properties
-
 - date [Date, null] - The current Date of the Datepicker, if set.
-- element [DOM Element] - The Datepicker element.
 
 ### Methods
-
 - setDate (date) - Sets the value of the Datepicker, it must be a Date object or parsable through 'new Date()', returns the new date as Date object.
+- clearTime () - Clears the datepickers value.
 - destroy - destroys the datepicker. Returns null.
 
 ### Options
-
 - container - The container where the Datepicker will be rendered into.
 - onSelect (date) - Callback that returns the selected Date.
 - firstDay *(Default: 0)* - Starting day of the week from 0-6 (0 = Sunday, 6 = Saturday).
