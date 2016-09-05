@@ -68,6 +68,7 @@
   }
 
   Datepicker.prototype = {
+    _init: init,
     _render: render,
     _setState: setState,
     setDate: setDate,
