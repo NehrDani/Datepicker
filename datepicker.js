@@ -62,14 +62,9 @@
     this._config = extend(defaults, arguments[0] || {});
     this._state.mode = this._config.startMode;
 
-    this.element = createElement("div", {class: "datepicker"});
+    this._datepicker = null;
 
-    // append to container if assigned
-    if (this._config.container)
-      this._config.container.appendChild(this.element);
-
-    // initial rendering
-    this._render();
+    this._init();
   }
 
   Datepicker.prototype = {
@@ -191,10 +186,21 @@
       break;
     }
 
-    this.element.innerHTML = null;
-    this.element.appendChild(fragment);
+    this._datepicker.innerHTML = null;
+    this._datepicker.appendChild(fragment);
     fragment = null;
-    return this.element;
+    return this._datepicker;
+  }
+  
+  function init () {
+    this._datepicker = createElement("div", {class: "datepicker"});
+    
+     // append to container if assigned
+    if (this._config.container)
+      this._config.container.appendChild(this._datepicker);
+
+    // initial rendering
+    this._render();
   }
 
   /**
@@ -206,11 +212,11 @@
    * @return {null} - returns null
    */
   function destroy () {
-    if (this.element.parentNode)
-      this.element.parentNode.removeChild(this.element);
+    if (this._datepicker.parentNode)
+      this._datepicker.parentNode.removeChild(this._datepicker);
 
-    this.element.innerHTML = null;
-    this.element = null;
+    this._datepicker.innerHTML = null;
+    this._datepicker = null;
     return null;
   }
 
