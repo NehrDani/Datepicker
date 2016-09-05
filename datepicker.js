@@ -1,7 +1,7 @@
 /*!
  * Datepicker
  *
- * Copyright © 2016 Daniel Nehring | MIT license | https://github.com/NehrDani/Datepicker
+ * Copyright (c) 2016 Daniel Nehring | MIT license | https://github.com/NehrDani/Datepicker
  */
 
 (function (window, document, undefined) {

@@ -1,16 +1,25 @@
 {
   "name": "datepicker",
   "version": "0.11.0",
-  "description": "Javascript Datepicker | lightweight, customizable CSS, no dependencies, extendable",
+  "description": "Javascript Datepicker | lightweight, customizable, no dependencies, extendable",
   "scripts": {
     "uglify": "uglifyjs --compress --mangle -o datepicker.min.js datepicker.js"
   },
   "keywords": [
     "datepicker",
-    "javascript"
+    "javascript",
+    "customizable"
   ],
-  "author": "Daniel Nehring",
+  "author": "Daniel Nehring <nehrdani@gmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NehrDani/Datepicker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NehrDani/Datepicker/issues"
+  },
+  "homepage": "https://nehrdani.github.io/Datepicker/",
   "devDependencies": {
     "uglify-js": "^2.7.3"
   }

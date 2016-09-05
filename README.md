@@ -1,5 +1,5 @@
 ## Javascript Datepicker
-**- lightweight, customizable CSS, no dependencies, extendable -**
+**- lightweight, customizable, no dependencies, extendable -**
 
 [Examples](https://nehrdani.github.io/Datepicker/)
 
