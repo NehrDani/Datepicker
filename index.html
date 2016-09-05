@@ -87,11 +87,12 @@
               datepicker.setDate(formatDate(this.value, true));
             });
 
-            demo.querySelectorAll(".set-date").forEach(function (el, i) {
-              el.addEventListener("click", function () {
+            var set = demo.querySelectorAll(".set-date");
+            for (var i = 0; i < set.length; i++) {
+              set[i].addEventListener("click", function () {
                 setDate(this.value, input, datepicker);
               });
-            });
+            }
           });
         </script>
       </section>
