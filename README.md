@@ -1,5 +1,5 @@
 ## Javascript Datepicker
-**- lightweight, customizable, no dependencies, extendable -**
+**- lightweight, customizable, no dependencies -**
 
 [Examples](https://nehrdani.github.io/Datepicker/)
 
@@ -67,6 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 ### About
 *There are many other Datepicker plugins out there. But I wanted to build one on my own and to share my work.*  
-*This is __not__ meant to be an all in one solution. This is from a developer for developers.*
+*This is* __not__ *meant to be an all in one solution. This is from a developer for developers.*
 
 **Feel free to try, fork and share. I appreciate every feedback.**

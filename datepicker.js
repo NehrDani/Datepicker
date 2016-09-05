@@ -221,16 +221,14 @@
     var state = this._state;
     var prev, change, next, newState;
 
-    // <div class="pick-head">
-    var head = createElement("div", {class: "pick-head"});
+    // <div class="datepicker-head">
+    var head = createElement("div", {class: "datepicker-head"});
 
-    // <button type="button" class="pick-btn pick-prev">
+    // <button type="button" class="datepicker-btn datepicker-prev">
     prev = createElement("button", {
       type: "button",
-      class: "pick-btn pick-prev"
+      class: "datepicker-btn datepicker-prev"
     });
-    // text
-    prev.innerHTML = "&#9666";
 
     // bind event
     prev.addEventListener("click", function (e) {
@@ -242,10 +240,10 @@
     head.appendChild(prev);
     // </button>
 
-    // <button type="button" class="pick-btn pick-change">
+    // <button type="button" class="datepicker-btn datepicker-change">
     change = createElement("button", {
       type: "button",
-      class: "pick-btn pick-change"
+      class: "datepicker-btn datepicker-change"
     });
 
     // add event
@@ -256,13 +254,11 @@
     head.appendChild(change);
     // </button>
 
-    // <button type="button" class="pick-btn pick-next">
+    // <button type="button" class="datepicker-btn datepicker-next">
     next = createElement("button", {
       type: "button",
-      class: "pick-btn pick-next"
+      class: "datepicker-btn datepicker-next"
     });
-    // text
-    next.innerHTML = "&#9656";
 
     // bind event
     next.addEventListener("click", function (e) {
@@ -340,10 +336,10 @@
 
       // </td>
       col = createElement("td");
-      // <button type="button" class="pick-btn pick-year" value={year}>
+      // <button type="button" class="datepicker-btn datepicker-year" value={year}>
       btn = createElement("button", {
         type: "button",
-        class: "pick-btn pick-year",
+        class: "datepicker-btn datepicker-year",
         value: year
       });
       // text
@@ -428,10 +424,10 @@
 
       // <td>
       col = createElement("td");
-      // <button type="button" class="pick-btn pick-month" value={month}>
+      // <button type="button" class="datepicker-btn datepicker-month" value={month}>
       btn = createElement("button", {
         type: "button",
-        class: "pick-btn pick-month",
+        class: "datepicker-btn datepicker-month",
         value: month
       });
       // text
@@ -576,10 +572,10 @@
       // <td>
       col = createElement("td");
 
-      // <button class="pick-btn pick-day">
+      // <button class="datepicker-btn datepicker-day">
       btn = createElement("button", {
         type: "button",
-        class: "pick-btn pick-day"
+        class: "datepicker-btn datepicker-day"
       });
 
       // mark dates outside current month
